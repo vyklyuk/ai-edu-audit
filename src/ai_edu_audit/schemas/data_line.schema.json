@@ -1,0 +1,199 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "data_line.schema.json",
+ "title": "data_line<N>.json — об'єкт D хабу лінії (вихід розрахунку)",
+ "type": "object",
+ "required": [
+  "passport",
+  "links",
+  "sem",
+  "cols",
+  "topics",
+  "line",
+  "owner",
+  "skills",
+  "b1",
+  "b2",
+  "unis",
+  "uni_t",
+  "consensus",
+  "mdef",
+  "dimn",
+  "weights",
+  "cm",
+  "cscores",
+  "prog",
+  "prog_index",
+  "pilot"
+ ],
+ "properties": {
+  "passport": {
+   "type": "array",
+   "items": {
+    "type": "array",
+    "minItems": 13,
+    "maxItems": 13
+   }
+  },
+  "links": {
+   "type": "array",
+   "items": {
+    "type": "array",
+    "minItems": 5,
+    "maxItems": 5,
+    "prefixItems": [
+     {
+      "type": "string"
+     },
+     {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     {
+      "type": "string"
+     },
+     {
+      "type": "string"
+     },
+     {
+      "enum": [
+       "ok",
+       "same",
+       "late",
+       "absent"
+      ]
+     }
+    ]
+   }
+  },
+  "sem": {
+   "type": "object"
+  },
+  "cols": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "topics": {
+   "type": "array",
+   "items": {
+    "type": "array",
+    "minItems": 4,
+    "maxItems": 4
+   }
+  },
+  "line": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "owner": {
+   "type": "object"
+  },
+  "skills": {
+   "type": "array",
+   "items": {
+    "type": "array"
+   }
+  },
+  "b1": {
+   "type": "array",
+   "minItems": 3,
+   "maxItems": 3
+  },
+  "b2": {
+   "type": "array",
+   "minItems": 3,
+   "maxItems": 3
+  },
+  "unis": {
+   "type": "array"
+  },
+  "uni_t": {
+   "type": "object"
+  },
+  "consensus": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "mdef": {
+   "type": "array",
+   "minItems": 24,
+   "maxItems": 24
+  },
+  "dimn": {
+   "type": "object"
+  },
+  "weights": {
+   "type": "object"
+  },
+  "cm": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "object",
+    "additionalProperties": {
+     "type": "array",
+     "minItems": 3,
+     "maxItems": 3
+    }
+   }
+  },
+  "cscores": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "array",
+    "minItems": 3,
+    "maxItems": 3,
+    "items": {
+     "oneOf": [
+      {
+       "type": "null"
+      },
+      {
+       "type": "object",
+       "required": [
+        "raw",
+        "final",
+        "veto",
+        "dims",
+        "scores",
+        "problems"
+       ]
+      }
+     ]
+    }
+   }
+  },
+  "prog": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "key",
+     "name",
+     "v",
+     "target",
+     "accept",
+     "hi",
+     "note",
+     "s"
+    ]
+   }
+  },
+  "prog_index": {
+   "type": "array",
+   "minItems": 3,
+   "maxItems": 3
+  },
+  "pilot": {
+   "type": "object"
+  }
+ },
+ "additionalProperties": false
+}

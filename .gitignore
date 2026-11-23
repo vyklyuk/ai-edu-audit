@@ -1,0 +1,8 @@
+__pycache__/
+*.egg-info/
+.venv/
+.pytest_cache/
+# робочі дані ЗВО і результати прогонів не комітимо
+runs/
+*.local.toml
+.env

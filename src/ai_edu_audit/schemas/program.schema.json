@@ -1,0 +1,214 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "program.schema.json",
+ "title": "program.json — паспорт ОП (етап I.1)",
+ "type": "object",
+ "required": [
+  "name",
+  "level",
+  "specialty",
+  "credits_total",
+  "courses",
+  "competences",
+  "outcomes"
+ ],
+ "properties": {
+  "name": {
+   "type": "string"
+  },
+  "level": {
+   "enum": [
+    "bachelor",
+    "master_opp",
+    "master_onp",
+    "phd"
+   ]
+  },
+  "specialty": {
+   "type": "object",
+   "required": [
+    "code",
+    "name"
+   ],
+   "properties": {
+    "code": {
+     "type": "string"
+    },
+    "name": {
+     "type": "string"
+    },
+    "list": {
+     "enum": [
+      "2015",
+      "2024"
+     ]
+    }
+   }
+  },
+  "year": {
+   "type": "integer"
+  },
+  "form": {
+   "type": "string"
+  },
+  "profile": {
+   "type": "string"
+  },
+  "credits_total": {
+   "type": "number"
+  },
+  "duration": {
+   "type": "string"
+  },
+  "courses": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "code",
+     "title",
+     "type",
+     "semesters",
+     "credits",
+     "control"
+    ],
+    "properties": {
+     "code": {
+      "type": "string"
+     },
+     "title": {
+      "type": "string"
+     },
+     "type": {
+      "enum": [
+       "обов'язкова",
+       "вибіркова",
+       "практика",
+       "атестація"
+      ]
+     },
+     "block": {
+      "type": [
+       "string",
+       "null"
+      ],
+      "description": "блок вибіркових (ВБ1, ВБ2 …)"
+     },
+     "semesters": {
+      "type": "array",
+      "items": {
+       "type": "integer"
+      }
+     },
+     "credits": {
+      "type": "number"
+     },
+     "control": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "competences": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "code",
+     "text"
+    ],
+    "properties": {
+     "code": {
+      "type": "string"
+     },
+     "text": {
+      "type": "string"
+     },
+     "kind": {
+      "enum": [
+       "ІК",
+       "ЗК",
+       "СК",
+       "ФК"
+      ]
+     }
+    }
+   }
+  },
+  "outcomes": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "code",
+     "text"
+    ]
+   }
+  },
+  "comp_matrix": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "description": "ОК -> коди компетентностей"
+  },
+  "prn_matrix": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "description": "ОК -> коди ПРН"
+  },
+  "sls": {
+   "type": "array",
+   "description": "структурно-логічна схема: [from, to]",
+   "items": {
+    "type": "array",
+    "minItems": 2,
+    "maxItems": 2
+   }
+  },
+  "standard": {
+   "type": "object",
+   "description": "компетентності й ПРН стандарту"
+  },
+  "evidence": {
+   "type": "array",
+   "description": "Цитати-докази для витягнутих полів (етап витягу). Кожна цитата має знаходитися в нормалізованому тексті файлу.",
+   "items": {
+    "type": "object",
+    "required": [
+     "field",
+     "quote",
+     "file"
+    ],
+    "properties": {
+     "field": {
+      "type": "string",
+      "description": "шлях до поля, напр. lectures[3] або hours.lab"
+     },
+     "quote": {
+      "type": "string",
+      "minLength": 3
+     },
+     "file": {
+      "type": "string"
+     },
+     "page": {
+      "type": [
+       "integer",
+       "null"
+      ]
+     }
+    },
+    "additionalProperties": false
+   }
+  }
+ }
+}

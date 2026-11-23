@@ -1,0 +1,243 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "course.schema.json",
+ "title": "Рядок courses.jsonl — витяг однієї РП",
+ "type": "object",
+ "required": [
+  "ok",
+  "title"
+ ],
+ "properties": {
+  "ok": {
+   "type": "string",
+   "description": "код ОК з ОП (ОК45, ВБ2.1 …)"
+  },
+  "title": {
+   "type": "string"
+  },
+  "status": {
+   "enum": [
+    "ok",
+    "missing",
+    "unreadable",
+    "excluded"
+   ],
+   "description": "missing — РП не знайдено; за замовчуванням ok"
+  },
+  "file": {
+   "type": "string",
+   "description": "лише в робочих даних"
+  },
+  "author": {
+   "type": "string",
+   "description": "лише в робочих даних, ніколи в хабі"
+  },
+  "fid": {
+   "type": "string"
+  },
+  "year": {
+   "type": [
+    "string",
+    "null"
+   ]
+  },
+  "code_old": {
+   "type": [
+    "string",
+    "null"
+   ]
+  },
+  "kind": {
+   "type": "string"
+  },
+  "credits": {
+   "type": [
+    "number",
+    "null"
+   ]
+  },
+  "hours": {
+   "type": "object",
+   "additionalProperties": false,
+   "properties": {
+    "lec": {
+     "type": "number",
+     "minimum": 0
+    },
+    "lab": {
+     "type": "number",
+     "minimum": 0
+    },
+    "prac": {
+     "type": "number",
+     "minimum": 0
+    },
+    "sem": {
+     "type": "number",
+     "minimum": 0
+    },
+    "studio": {
+     "type": "number",
+     "minimum": 0
+    },
+    "clin": {
+     "type": "number",
+     "minimum": 0
+    },
+    "self": {
+     "type": "number",
+     "minimum": 0
+    }
+   }
+  },
+  "practice_type": {
+   "enum": [
+    "lab",
+    "prac",
+    "sem",
+    "studio",
+    "clinical",
+    "field",
+    "project",
+    null
+   ]
+  },
+  "control": {
+   "type": [
+    "string",
+    "null"
+   ],
+   "description": "null — форму контролю в документі не визначено"
+  },
+  "comps": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "prn": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "prereq": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "next": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "lectures": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "labs": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   },
+   "description": "теми лабораторних (формат еталону лінії 1)"
+  },
+  "practice": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   },
+   "description": "теми практичних/студійних занять (формат навички)"
+  },
+  "assessment": {
+   "type": "object",
+   "additionalProperties": {
+    "type": [
+     "number",
+     "string"
+    ]
+   }
+  },
+  "lit_years": {
+   "type": "array",
+   "items": {
+    "type": "integer",
+    "minimum": 1800,
+    "maximum": 2100
+   }
+  },
+  "lit_classic": {
+   "type": "array",
+   "items": {
+    "type": "integer"
+   }
+  },
+  "tools": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "ai_policy": {
+   "type": "boolean"
+  },
+  "notes": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "evidence": {
+   "type": "array",
+   "description": "Цитати-докази для витягнутих полів (етап витягу). Кожна цитата має знаходитися в нормалізованому тексті файлу.",
+   "items": {
+    "type": "object",
+    "required": [
+     "field",
+     "quote",
+     "file"
+    ],
+    "properties": {
+     "field": {
+      "type": "string",
+      "description": "шлях до поля, напр. lectures[3] або hours.lab"
+     },
+     "quote": {
+      "type": "string",
+      "minLength": 3
+     },
+     "file": {
+      "type": "string"
+     },
+     "page": {
+      "type": [
+       "integer",
+       "null"
+      ]
+     }
+    },
+    "additionalProperties": false
+   }
+  },
+  "summary": {
+   "type": "string",
+   "description": "розділ силабуса «Короткий зміст» (джерело тем, коли немає тематичного плану)"
+  },
+  "description": {
+   "type": "string",
+   "description": "розділ силабуса «Опис»"
+  },
+  "goal": {
+   "type": "string"
+  },
+  "topics_source": {
+   "type": "string",
+   "description": "звідки взято теми: тематичний план РП чи текст силабуса"
+  }
+ },
+ "additionalProperties": false
+}

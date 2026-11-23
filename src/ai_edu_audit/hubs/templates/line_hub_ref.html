@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>__TITLE__</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: аналітичний журнал гаранта — шапка з індексом програми, вкладки-звіти, щільні таблиці з кольоровими зонами */
+:root{
+  --paper:#fbfbfa;--panel:#f3f4f2;--rule:#dcded9;--rule-soft:#e8e9e5;
+  --ink:#16191c;--ink-2:#4d5358;--ink-3:#767d83;
+  --deep:#1f4e79;--deep-soft:#e7eef5;
+  --ok:#1b6b45;--ok-soft:#e3f0e8;--warn:#9a6400;--warn-soft:#fbf1dc;--bad:#a8322d;--bad-soft:#f8e6e4;
+  --none:#eeefed;--c1:#cfe0ee;--c2:#4f84b3;--c2-ink:#ffffff;
+  --after:#0f7a7a;--after-soft:#dff0ef;
+  --ff-text:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --ff-lab:"IBM Plex Sans Condensed","IBM Plex Sans",system-ui,sans-serif;
+  --ff-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#15171a;--panel:#1d2024;--rule:#30343a;--rule-soft:#262a2f;
+  --ink:#eceef0;--ink-2:#b2b9c0;--ink-3:#848c94;--deep:#7fb3e0;--deep-soft:#1b2a38;
+  --ok:#5bbf8c;--ok-soft:#17291f;--warn:#e0a640;--warn-soft:#2c2414;--bad:#ef7b72;--bad-soft:#341c1b;
+  --none:#22262a;--c1:#24394d;--c2:#5f97c8;--c2-ink:#0d1620;--after:#4fc2c0;--after-soft:#132a2a;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#15171a;--panel:#1d2024;--rule:#30343a;--rule-soft:#262a2f;
+  --ink:#eceef0;--ink-2:#b2b9c0;--ink-3:#848c94;--deep:#7fb3e0;--deep-soft:#1b2a38;
+  --ok:#5bbf8c;--ok-soft:#17291f;--warn:#e0a640;--warn-soft:#2c2414;--bad:#ef7b72;--bad-soft:#341c1b;
+  --none:#22262a;--c1:#24394d;--c2:#5f97c8;--c2-ink:#0d1620;--after:#4fc2c0;--after-soft:#132a2a;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:15px/1.55 var(--ff-text);margin:0}
+.wrap{max-width:1640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--ff-lab);font-weight:600;text-wrap:balance;margin:0;letter-spacing:-.005em}
+h1{font-size:clamp(26px,4vw,38px);line-height:1.1}
+h2{font-size:22px;line-height:1.2}
+h3{font-size:16px}
+p{margin:0}
+.mono,.num{font-family:var(--ff-mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-family:var(--ff-lab);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.muted{color:var(--ink-2)}
+.small{font-size:13px}
+header.top{border-bottom:1px solid var(--rule);background:var(--panel)}
+header.top .wrap{padding-block:22px 0;display:grid;gap:14px}
+.headrow{display:flex;flex-wrap:wrap;gap:18px 32px;align-items:flex-end;justify-content:space-between}
+.headrow > div{min-width:0}
+.lede{max-width:68ch;color:var(--ink-2)}
+nav.tabs{display:flex;flex-wrap:wrap;gap:2px;margin-top:6px}
+nav.tabs a{font-family:var(--ff-lab);font-size:14px;font-weight:500;color:var(--ink-2);text-decoration:none;padding:10px 14px;border:1px solid transparent;border-bottom:none;border-radius:6px 6px 0 0;white-space:nowrap}
+nav.tabs a:hover{color:var(--ink)}
+nav.tabs a[aria-current="page"]{background:var(--paper);border-color:var(--rule);color:var(--deep);position:relative;top:1px}
+nav.tabs a:focus-visible,button:focus-visible{outline:2px solid var(--deep);outline-offset:2px}
+main .wrap{padding-block:28px 64px}
+section.view{display:grid;gap:22px}
+section.view > *{min-width:0}
+.sechead{display:grid;gap:6px;max-width:80ch}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.g2 > *,.g4 > *{min-width:0}
+.tile{border:1px solid var(--rule);border-radius:8px;padding:14px 16px;background:var(--paper);display:grid;gap:6px;align-content:start}
+.tile .big{font-family:var(--ff-mono);font-size:26px;font-weight:500;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.tile .big .arr{color:var(--ink-3);font-size:18px}
+.panel{background:var(--panel);border-radius:8px;padding:16px 18px;display:grid;gap:10px}
+.tblwrap{overflow-x:auto;border:1px solid var(--rule);border-radius:8px}.tblwrap.noscroll{overflow:visible}table.fixed{table-layout:fixed;width:100%}table.fixed td{overflow-wrap:anywhere}table.fixed .cc{white-space:normal}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:8px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--rule-soft)}
+th{font-family:var(--ff-lab);font-weight:600;font-size:12.5px;color:var(--ink-2);background:var(--panel);position:sticky;top:0;z-index:1}
+tr:last-child td{border-bottom:none}
+td.c,th.c{text-align:center}
+td.r,th.r{text-align:right}
+.chip{display:inline-block;font-family:var(--ff-lab);font-size:12px;font-weight:500;padding:1px 8px;border-radius:999px;white-space:nowrap;border:1px solid transparent}
+.ok{background:var(--ok-soft);color:var(--ok)}
+.warn{background:var(--warn-soft);color:var(--warn)}
+.bad{background:var(--bad-soft);color:var(--bad)}
+.neu{background:var(--none);color:var(--ink-2)}
+.aft{background:var(--after-soft);color:var(--after)}
+.code{font-family:var(--ff-mono);font-size:12.5px;font-weight:500}
+ul.clean{margin:0;padding-left:18px;display:grid;gap:4px}
+.prf{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}.prf button{font:inherit;font-size:13px;padding:4px 12px;border-radius:999px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer;display:inline-flex;align-items:center;gap:6px}.prf button[aria-pressed="true"]{background:var(--deep-soft);border-color:var(--deep);color:var(--ink);font-weight:600}.prf .sw{display:inline-block;width:10px;height:10px;border-radius:3px;border:1px solid transparent}
+.gfwrap{position:sticky;top:0;z-index:5;background:var(--paper);padding:6px 0 2px;margin-bottom:6px}.note.stage{border-left-color:var(--warn)}
+.fgrid > *{min-width:0}.detail .cc{white-space:normal;max-width:100%}.detail .focus,.detail .evl li{overflow-wrap:anywhere}
+.tpmode{display:inline-flex;margin:4px 0 12px}.tpmode button{font:inherit;font-size:14px;padding:6px 14px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2);cursor:pointer}.tpmode button:first-child{border-radius:8px 0 0 8px}.tpmode button:last-child{border-radius:0 8px 8px 0;border-left:none}.tpmode button[aria-pressed="true"]{background:var(--deep);color:var(--paper);border-color:var(--deep)}
+.ctgrid{display:grid;grid-template-columns:minmax(260px,360px) 1fr;gap:16px;align-items:start;margin-top:14px}@media (max-width:900px){.ctgrid{grid-template-columns:1fr}}
+.ctlist{position:sticky;top:56px;max-height:calc(100vh - 70px);overflow:auto}
+.ctrow{display:grid;grid-template-columns:1fr auto;gap:2px 8px;width:100%;text-align:left;font:inherit;font-size:13px;background:none;border:1px solid transparent;border-radius:6px;padding:5px 6px;cursor:pointer;color:var(--ink)}.ctrow:hover{background:var(--rule-soft)}.ctrow[aria-pressed="true"]{background:var(--deep-soft);border-color:var(--deep)}
+.ctrow .ctl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ctrow .ctbar{grid-column:1/-1}
+.ctbar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--rule-soft)}.ctbar span{display:block;height:100%}.b-unique{background:var(--ok)}.b-dev{background:var(--warn)}.b-near{background:var(--ink-3)}.b-repeat{background:var(--bad)}
+.ctt td{vertical-align:top}.ctt .chip{white-space:normal;line-height:1.3}.cth{margin-bottom:6px}.ctt tr.ct-repeat td:first-child{box-shadow:inset 3px 0 var(--bad)}
+#unTable td.tname{cursor:pointer}#unTable td.tname:hover{text-decoration:underline}#unTable tr.rowsel td{background-image:linear-gradient(rgba(31,78,121,.08),rgba(31,78,121,.08))}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:12.5px;color:var(--ink-2);align-items:center}
+.sw{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px;border:1px solid var(--rule)}
+/* heatmap */
+.hm td.cell{width:46px;min-width:46px;text-align:center;font-family:var(--ff-mono);font-size:12px;padding:6px 2px;border-left:1px solid var(--paper)}
+.v0{background:var(--none);color:var(--ink-3)}
+.v1{background:var(--c1);color:var(--ink)}
+.v2{background:var(--c2);color:var(--c2-ink)}
+.vN{background:repeating-linear-gradient(45deg,var(--none) 0 4px,var(--paper) 4px 8px);color:var(--ink-3)}
+.hm th.rot{writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--ff-mono);font-size:11.5px;padding:8px 4px;text-align:left;white-space:nowrap}
+.hm th.grp{text-align:center;font-size:11.5px}
+.dupcount{font-family:var(--ff-mono);font-weight:500}
+/* buttons */
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{font:500 13px var(--ff-lab);padding:6px 12px;border-radius:6px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-2);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--deep);border-color:var(--deep);color:var(--paper)}
+.seg button:hover{border-color:var(--deep)}
+/* bars */
+.bar{height:8px;border-radius:4px;background:var(--rule-soft);position:relative;min-width:60px}
+.bar span{position:absolute;inset:0 auto 0 0;border-radius:4px}
+.zone{font-family:var(--ff-mono);font-size:12.5px;padding:1px 6px;border-radius:4px}
+.z-ok{background:var(--ok-soft);color:var(--ok)}.z-warn{background:var(--warn-soft);color:var(--warn)}.z-bad{background:var(--bad-soft);color:var(--bad)}.z-na{background:var(--none);color:var(--ink-3)}
+.card{border:1px solid var(--rule);border-radius:8px;padding:16px;display:grid;gap:10px;align-content:start;min-width:0}
+.card h3{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.wavehead{font-family:var(--ff-lab);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+svg text{font-family:var(--ff-lab)}
+.note{border-left:3px solid var(--deep);padding:4px 0 4px 12px;color:var(--ink-2);max-width:85ch}
+
+.cc{display:inline-flex;gap:4px;align-items:baseline;font-size:12.5px;background:var(--deep-soft);color:var(--ink);border-radius:5px;padding:1px 7px;margin:2px 4px 2px 0;white-space:nowrap}
+.cc b{font-family:var(--ff-mono);font-weight:500;font-size:12px;color:var(--deep)}
+.cc i{font-style:normal;color:var(--ink-3)}
+.ccl{display:flex;flex-wrap:wrap;margin-top:4px}
+.detail{border:1px solid var(--deep);border-radius:8px;padding:14px 16px;background:var(--paper);display:grid;gap:10px;align-content:start;min-width:0}
+.detail h3{font-size:16px}
+.dhead{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.g3 > *{min-width:0}
+#prsvg .node,#prsvg .edge{cursor:pointer;transition:opacity .15s}
+
+#prsvg .node.on rect{stroke-width:2.5}
+#prsvg .edge.on .ln{stroke-width:3.5}
+#prsvg .edge:hover .ln{stroke-width:3.5}
+#prsvg .node:hover rect{stroke:var(--deep);stroke-width:2}
+#prsvg .node:focus-visible rect,#prsvg .edge:focus-visible .ln{outline:none;stroke:var(--deep);stroke-width:3}
+tr.pick{cursor:pointer}tr.pick:hover td{background:var(--deep-soft)}
+.tpgrid{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:14px;align-items:start}
+@media (max-width:900px){.tpgrid{grid-template-columns:1fr}}
+.sticky{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
+.hm td.tname{min-width:220px;cursor:pointer}
+.hm td.tname:hover{color:var(--deep);text-decoration:underline}
+.hm td.pk{cursor:pointer}
+.hm td.pk:hover{outline:2px solid var(--deep);outline-offset:-2px}
+.hm td.sel{outline:3px solid var(--ink);outline-offset:-3px}
+.hm tr.rowsel td.tname{font-weight:600;color:var(--deep)}
+.hm tr.rowsel td{box-shadow:inset 0 2px 0 var(--deep),inset 0 -2px 0 var(--deep)}
+.hm .colsel{box-shadow:inset 2px 0 0 var(--deep),inset -2px 0 0 var(--deep)}
+.hm th.rot{height:190px;vertical-align:bottom}.hm tr.tblock td{background:var(--panel);font-weight:600;font-size:13.5px;padding:10px 8px 6px;text-align:left;border-top:2px solid var(--rule)}.hm tr.tblock .muted{font-weight:400}
+.hm th.rot .code{color:var(--deep)}
+.hm td.gap,.hm th.gap{width:6px;min-width:6px;padding:0;background:var(--paper);border:none}
+.hm td.cell span{font-size:14px}
+.v2c{background:var(--c2);color:var(--c2-ink)}.v1c{background:var(--c1);color:var(--ink)}
+.focus{border:1px dashed var(--rule);border-radius:6px;padding:10px;display:grid;gap:6px}
+ul.evl{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+ul.evl li{border-left:3px solid var(--rule);padding-left:8px}
+ul.evl li.cur{border-left-color:var(--ink)}
+.uh{min-width:64px;width:64px;vertical-align:bottom}
+#unTable td.cell{width:64px;min-width:64px}.uh b{display:block;font-size:12.5px;color:var(--ink)}.uh span{display:block;font-family:var(--ff-mono);font-weight:400;font-size:11px;color:var(--ink-3)}
+details.pc{border:1px solid var(--rule);border-radius:8px;background:var(--paper);overflow:hidden}
+details.pc + details.pc{margin-top:8px}
+details.pc summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:12px 14px}
+details.pc summary::-webkit-details-marker{display:none}
+details.pc summary:hover{background:var(--panel)}
+details.pc summary:focus-visible{outline:2px solid var(--deep);outline-offset:-2px}
+details.pc .pcname{font-weight:600;flex:1 1 260px;min-width:0}
+details.pc .pcmeta{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+details.pc .arr{color:var(--ink-3)}
+details.pc .tw{width:10px;height:10px;border-right:2px solid var(--ink-3);border-bottom:2px solid var(--ink-3);transform:rotate(45deg);transition:transform .15s;margin-left:4px}
+details.pc[open] .tw{transform:rotate(-135deg)}
+details.pc[open] summary{border-bottom:1px solid var(--rule);background:var(--panel)}
+details.pc.new summary{border-left:4px solid var(--bad)}
+details.pc.line summary{border-left:4px solid var(--deep)}
+details.pc.pilot summary{border-left:4px solid var(--after)}
+details.pc.pre summary{border-left:4px solid var(--rule)}
+.pcbody{padding:14px;display:grid;gap:14px}
+.verdict{font-size:15px;max-width:85ch}
+.cols3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.col{border-radius:8px;padding:10px;display:grid;gap:8px;align-content:start;min-width:0}
+.col.rm{background:var(--bad-soft)}.col.ad{background:var(--ok-soft)}.col.kp{background:var(--panel)}
+.colh{font-family:var(--ff-lab);font-size:12px;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.col.rm .colh{color:var(--bad)}.col.ad .colh{color:var(--ok)}.col.kp .colh{color:var(--ink-3)}
+.col .it{background:var(--paper);border-radius:6px;padding:8px 10px;display:grid;gap:3px;font-size:13.5px}
+.col.rm .it{border-left:3px solid var(--bad)}.col.ad .it{border-left:3px solid var(--ok)}.col.kp .it{border-left:3px solid var(--rule)}
+.it .ov{font-size:12.5px;color:var(--bad);font-weight:500}
+.labs{display:grid;grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr);gap:10px;align-items:start}
+.labs ol{margin:6px 0 0;padding-left:20px;display:grid;gap:3px;font-size:13.5px}
+.labarr{font-size:22px;color:var(--after);text-align:center;padding-top:24px}
+@media (max-width:640px){.labs{grid-template-columns:1fr}.labarr{display:none}}
+.pgroup{display:grid;gap:0}
+.pgroup h3{margin-bottom:8px}
+
+.detail.float{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));width:min(400px,calc(100vw - 32px));max-height:min(70vh,640px);overflow:auto;z-index:30;box-shadow:0 10px 30px rgba(0,0,0,.18),0 2px 6px rgba(0,0,0,.08);padding-top:12px}
+.xclose{position:sticky;top:0;justify-self:end;margin-bottom:-28px;width:28px;height:28px;border-radius:6px;border:1px solid var(--rule);background:var(--paper);color:var(--ink-2);font-size:18px;line-height:1;cursor:pointer;z-index:2}
+.xclose:hover{color:var(--ink);border-color:var(--deep)}
+.hm td.cell{width:40px;min-width:40px}
+
+.fgrid{display:grid;gap:12px}
+.fcol{display:grid;gap:8px;align-content:start;min-width:0}
+@media (min-width:900px){
+ .detail.float{left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));width:auto;max-width:1608px;margin:0 auto;max-height:44vh}
+ .fgrid{grid-template-columns:1.1fr 1.3fr .9fr;gap:20px}
+}
+
+[hidden]{display:none!important}
+.schart{display:grid;gap:2px;overflow-x:auto}
+.srow{display:grid;grid-template-columns:minmax(150px,240px) minmax(260px,1fr) 210px;gap:12px;align-items:center;padding:6px 6px;border:0;background:none;text-align:left;font:inherit;color:inherit;border-radius:6px;min-width:640px}
+button.srow{cursor:pointer}button.srow:hover{background:var(--deep-soft)}
+.slab{font-size:13.5px;display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center}.slab b{font-family:var(--ff-mono);font-weight:500;color:var(--deep)}
+.strack{position:relative;height:22px}
+.saxis .strack{height:16px}
+.saxis .strack span{position:absolute;transform:translateX(-50%);font-size:11px;color:var(--ink-3);font-family:var(--ff-mono);white-space:nowrap}
+.sbands span{position:absolute;top:8px;height:6px}
+.b-bad{background:var(--bad-soft)}.b-bad2{background:var(--bad-soft);opacity:.6}.b-warn{background:var(--warn-soft)}.b-ok{background:var(--ok-soft)}
+.sline{position:absolute;top:10px;height:2px;background:var(--ink-3)}
+.sline.dash{background:repeating-linear-gradient(90deg,var(--after) 0 4px,transparent 4px 8px)}
+.sp{position:absolute;top:4px;width:14px;height:14px;margin-left:-7px;border-radius:50%;display:block}
+.sp.p0{background:var(--ink);border:2px solid var(--paper)}
+.sp.p1{background:var(--paper);border:2px solid var(--ink);transform:rotate(45deg);border-radius:2px;width:12px;height:12px;margin-left:-6px;top:5px}
+.sp.p2{background:var(--after);border:2px solid var(--paper)}
+.snum{display:flex;gap:4px;align-items:center;justify-content:flex-end;font-family:var(--ff-mono);font-size:12.5px}
+.snum .arr{color:var(--ink-3)}
+.sgroup{font-size:16px;font-weight:600;color:var(--ink);padding:18px 6px 6px;min-width:640px;border-bottom:1px solid var(--rule);margin-bottom:4px;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}.sgroup .muted{font-weight:400;font-size:13px}.sgroup .gsw{display:inline-block;width:12px;height:12px;border-radius:3px}
+#prsvg .dim{opacity:.45}
+.roles{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.roles > *{min-width:0}.role .cc{white-space:normal}.role .eyebrow{overflow-wrap:anywhere}
+.role{border:1px solid var(--rule);border-radius:8px;padding:14px;display:grid;gap:8px;align-content:start;background:var(--paper)}
+.role h3{font-size:16px}
+.role .med{font-family:var(--ff-mono);font-size:26px;font-weight:500}
+.role .tr{font-size:13px;font-weight:500}.role .tr.up{color:var(--ok)}.role .tr.down{color:var(--bad)}
+.role .ladder{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;font-size:12px;text-align:center}
+.role .ladder div{background:var(--panel);border-radius:5px;padding:4px 2px}.role .ladder b{display:block;font-family:var(--ff-mono);font-weight:500;font-size:13px}
+.cseg{display:grid;gap:10px}.cgrp{display:grid;gap:4px}
+.seg button .bn{font-weight:400;opacity:.8}
+.seg button:disabled{opacity:.5;cursor:not-allowed;border-style:dashed}
+.xtiles{grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr))}
+.xtiles.x2{grid-template-columns:repeat(auto-fit,minmax(min(400px,100%),1fr))}
+.xtiles > *{min-width:0}
+.tile.xt dl{margin:6px 0 0;display:grid;gap:2px}
+.tile.xt dt{font-family:var(--ff-lab);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-top:6px}
+.tile.xt dd{margin:0;font-size:13.5px;line-height:1.45}
+footer{border-top:1px solid var(--rule);color:var(--ink-3);font-size:12.5px}
+footer .wrap{padding-block:18px 28px;display:grid;gap:6px}
+a{color:var(--deep)}
+@media (max-width:520px){h2{font-size:19px}.tile .big{font-size:22px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.roles .role{min-width:0}.roles .role p,.roles .role .tr,.roles .role .eyebrow{overflow-wrap:anywhere}.ladder b{white-space:normal}.role{overflow:hidden}.role .ladder{grid-template-columns:repeat(3,minmax(0,1fr))}.role .cc{display:flex;flex-wrap:wrap;max-width:100%}.role .abroad{}
+</style>
+
+</head><body>
+<header class="top"><div class="wrap">
+  <div class="headrow">
+    <div style="display:grid;gap:8px">
+      <a class="small" href="__OVERVIEW_LINK__" style="color:inherit">← Огляд ОП</a>
+      <span class="eyebrow" id="hEyebrow"></span>
+      <h1 id="hTitle"></h1>
+      <p class="lede" id="hLede"></p>
+    </div>
+    <div class="tile" style="min-width:250px" id="headIdx"></div>
+  </div>
+  <nav class="tabs" id="tabs" aria-label="Звіти"></nav>
+</div></header>
+
+<main><div class="wrap" id="app"></div></main>
+
+<footer><div class="wrap" id="foot"></div></footer>
+
+<script>
+const DATA = __DATA__;
+const {D, R, X, U, A, META} = DATA;
+const K = META.K;  // частка ефекту хвилі 2 з пілоту; null — пілоту немає
+const EXP = (w1, w2) => (K==null || w1==null || w2==null) ? null : w1 + K*(w2 - w1);
+
+const $ = (s, el=document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const f1 = x => x==null ? "—" : (Math.round(x*10)/10).toFixed(1).replace(".", ",");
+const f2 = x => x==null ? "—" : (Math.round(x*100)/100).toFixed(2).replace(".", ",");
+const pct = x => x==null ? "—" : Math.round(x*100) + "%";
+const zone = s => s==null ? "z-na" : s>=85 ? "z-ok" : s>=70 ? "z-warn" : "z-bad";
+const zoneTxt = s => s==null ? "н/д" : s>=85 ? "актуальна" : s>=70 ? "2–4 правки" : s>=55 ? "структурний перегляд" : "переписати";
+const title = c => (D.passport.find(r=>r[0]===c)||[])[1] || c;
+
+const VIEWS = U.views;
+
+function headIdx(){
+  const p = D.prog_index, exp = EXP(p[1], p[2]);
+  $("#headIdx").innerHTML = `<span class="eyebrow">${esc(U.index_label)}</span>
+   <div class="big"><span class="${zone(p[0])} zone" style="font-size:24px">${f1(p[0])}</span><span class="arr">→</span><span>${f1(p[1])}</span><span class="arr">→</span><span class="aft zone" style="font-size:24px">${f1(p[2])}</span></div>
+   <span class="small muted">зараз → хвиля 1 → хвиля 2 (повне виконання)${exp!=null?`. Очікувано з урахуванням досвіду пілоту: <b class="num">${f1(exp)}</b>`:`. ${esc(U.index_note||"")}`}</span>`;
+}
+
+
+
+function xtile(t){return `<div class="tile xt"><span class="eyebrow">${esc(t.l)}</span>
+  <div class="big"><span class="zone ${t.z==="bad"?"z-bad":t.z==="ok"?"z-ok":"z-warn"}" style="font-size:inherit">${t.v}</span>${t.to?`<span class="arr">→</span><span class="zone z-ok" style="font-size:.8em">${t.to}</span>`:""}</div>
+  ${t.to?`<span class="small muted">зараз → після правок</span>`:""}
+  <dl><dt>Що показує</dt><dd>${esc(t.what)}</dd><dt>Як рахуємо</dt><dd>${esc(t.how)}</dd><dt>Ціль</dt><dd>${esc(t.goal)}</dd>${t.so?`<dt>Що з цього</dt><dd>${esc(t.so)}</dd>`:""}</dl></div>`;}
+/* графік балів РП */
+const ORDER=U.order;
+function scoreChart(){
+  const x=v=>((v-40)/60*100);
+  const band=`<div class="sbands"><span style="left:0;width:${x(55)}%" class="b-bad"></span><span style="left:${x(55)}%;width:${x(70)-x(55)}%" class="b-bad2"></span><span style="left:${x(70)}%;width:${x(85)-x(70)}%" class="b-warn"></span><span style="left:${x(85)}%;width:${100-x(85)}%" class="b-ok"></span></div>`;
+  const axis=`<div class="srow saxis"><div></div><div class="strack">${[40,55,70,75,85,100].map(v=>`<span style="left:${x(v)}%">${v===75?"75 вето":v}</span>`).join("")}</div><div class="snum small muted">зараз → хв.1 → хв.2</div></div>`;
+  const rows=ORDER.map(([g,l0])=>[g,l0.filter(inG)]).filter(([g,l])=>l.length).map(([g,list])=>{const fs=list.map(c=>D.cscores[c]&&D.cscores[c][0]?D.cscores[c][0].final:null).filter(v=>v!=null).sort((a,b)=>a-b); const md=fs.length?(fs.length%2?fs[(fs.length-1)/2]:(fs[fs.length/2-1]+fs[fs.length/2])/2):null; const gk=GRP(list[0]);
+    return `<div class="sgroup">${GMODE&&typeof PRG!=="undefined"?`<span class="gsw" style="background:${PRG[gk]}"></span>`:""}${esc(g)} <span class="muted">${list.length} силабусів${md!=null?` · медіана зараз <b class="zone ${zone(md)}">${f1(md)}</b>`:""}</span></div>`+list.map(c=>{
+    const s=D.cscores[c]; if(!s) return "";
+    const v=s.map(o=>o?o.final:null); const miss=v[0]==null;
+    const pts=v.map((y,i)=>y==null?"":`<i class="sp p${i}" style="left:${x(Math.max(40,y))}%" title="${["зараз","хвиля 1","хвиля 2"][i]}: ${f1(y)}"></i>`).join("");
+    const cl=z=>Math.min(100,Math.max(40,z)); const lo=cl(Math.min(...v.filter(z=>z!=null))), hi=cl(Math.max(...v.filter(z=>z!=null)));
+    return `<button type="button" class="srow" data-c="${c}"><div class="slab"><b>${c}</b> ${esc(SH(c))}${miss?' <span class="chip bad">${esc(U.missing_label)}</span>':''}${s[0]&&s[0].veto?' <span class="chip warn">вето</span>':''}</div>
+      <div class="strack">${band}<span class="sline ${miss?"dash":""}" style="left:${x(lo)}%;width:${x(hi)-x(lo)}%"></span>${pts}</div>
+      <div class="snum">${v.map((y,i)=>y==null?'<span class="muted">—</span>':`<span class="zone ${zone(y)}">${f1(y)}</span>`).join('<span class="arr">→</span>')}</div></button>`}).join("")}).join("");
+  return `<div class="schart">${axis}${rows}</div>`;
+}
+/* ---------- Зведення ---------- */
+function vSummary(){
+  const chart = scoreChart();
+  return `<section class="view">
+   <div class="sechead"><span class="eyebrow">Звіт 8 · для гаранта</span><h2>${esc(U.summary_title||"Зведення по лінії")}</h2>
+   <p class="muted">${esc(U.summary_lede)}</p></div>
+   <div class="grid xtiles">${U.summary_tiles.map(xtile).join("")}</div>
+   <div class="card"><h3>Бали робочих програм: зараз, після хвилі 1 і після хвилі 2</h3>
+     <p class="small muted">Кожен рядок — один курс (силабус). Кружок — зараз, ромб — після формальних правок, бірюзова позначка — після змістового оновлення. Фон шкали — зони інтерпретації. Клацніть рядок, щоб відкрити 24 метрики курсу.</p>
+     ${chart}
+     <div class="grid g2" style="margin-top:6px">${U.summary_chart_notes.map(t=>`<p class="small muted">${esc(t)}</p>`).join("")}</div></div>
+   <div class="card"><h3>${esc(U.wave1_title)}</h3>
+     <div class="tblwrap"><table><thead><tr><th>Хто</th><th>Що зробити</th><th>Яку метрику рухає</th></tr></thead><tbody>
+     ${R.wave1.map(w=>`<tr><td class="code">${esc(w[0])}</td><td>${esc(w[1])}</td><td class="code">${esc(w[2])}</td></tr>`).join("")}
+     </tbody></table></div>
+     <p class="small muted">Хвиля 2 (змістова) і зміни ОП — у вкладці «Шляхи вдосконалення».</p></div>
+  </section>`;
+}
+
+/* ---------- Паспорт ---------- */
+function vPassport(){
+  const row = r => {
+    const [c,t,role,sem,ocr,octl,st,yr,rcr,rctl,kind,codes,iss] = r;
+    if(st==="missing") return `<tr><td class="code">${c}</td><td>${esc(t)}</td><td class="c num">${sem??"—"}</td><td class="c num">${ocr}</td><td>${octl}</td><td colspan="4"><span class="chip bad">${esc(U.missing_label)}</span></td><td class="small">${iss.map(esc).join("; ")}</td></tr>`;
+    if(rcr==null) return `<tr><td class="code">${c}</td><td>${esc(t)}</td><td class="c num">${sem??"—"}</td><td class="c num">${ocr}</td><td>${octl}</td>
+     <td class="small">${esc(kind||"")}</td><td class="c"><span class="chip neu">—</span></td><td>${rctl?`<span class="chip ${rctl===octl?"ok":(octl==="диф. залік"&&rctl==="залік")?"warn":"bad"}">${rctl}</span>`:'<span class="chip neu">не визначено</span>'}</td>
+     <td><span class="chip ${/немає в ОП/.test(codes||"")?"bad":"ok"}">${esc(codes||"—")}</span></td><td class="small">${iss.map(esc).join("; ")}</td></tr>`;
+    const crOk = ocr===rcr, ctlOk = octl.replace("диф. ","")===rctl || (octl==="диф. залік"&&rctl==="диф. залік") ;
+    const ctlCls = octl===rctl ? "ok" : (octl==="диф. залік"&&rctl==="залік") ? "warn" : "bad";
+    const kindCls = /обов/.test(kind) ? "neu" : "warn";
+    const codeCls = /нові/.test(codes) ? "warn" : "bad";
+    return `<tr><td class="code">${c}</td><td>${esc(t)}</td><td class="c num">${sem}</td><td class="c num">${ocr}</td><td>${octl}</td>
+     <td class="num">${yr}</td><td class="c"><span class="chip ${crOk?"ok":"bad"}">${rcr}</span></td><td><span class="chip ${ctlCls}">${rctl}</span></td>
+     <td><span class="chip ${codeCls}">${esc(codes)}</span></td><td class="small">${iss.map(esc).join("; ")}</td></tr>`;
+  };
+  const th = `<tr><th>Код</th><th>Курс</th><th class="c">Сем.</th><th class="c">Кр. ОПП</th><th>Контроль ОПП</th><th>${esc(U.doc_label)}</th><th class="c">Кр. у док.</th><th>Контроль у док.</th><th>Коди в док.</th><th>Що не так</th></tr>`;
+  const line = D.passport.filter(r=>r[2]==="line"&&inG(r[0])), pre = D.passport.filter(r=>r[2]==="pre"&&inG(r[0]));
+  const gtables = GMODE ? U.groups.filter(g=>prOn.has(g.k)).map(g=>{const rs=line.filter(r=>GRP(r[0])===g.k); const cr=rs.reduce((a,r)=>a+r[4],0);
+     return `<h3>${esc(g.s)} · ${rs.length} компонентів · ${String(cr).replace(".",",")} кр.</h3><div class="tblwrap"><table><thead>${th}</thead><tbody>${rs.map(row).join("")}</tbody></table></div>`}).join("") : null;
+  return `<section class="view">
+   <div class="sechead"><span class="eyebrow">Звіт 1</span><h2>Паспорт корпусу</h2>
+   <p class="muted">${esc(U.passport_lede)}</p></div>
+   <div class="grid g4">${U.passport_tiles.map(t=>`<div class="tile"><span class="eyebrow">${esc(t.l)}</span><div class="big">${esc(t.v)}</div><span class="small muted">${esc(t.s)}</span></div>`).join("")}</div>
+   ${gtables!==null?gtables:`<h3>${esc(U.passport_h_line)}</h3>
+   <div class="tblwrap"><table><thead>${th}</thead><tbody>${line.map(row).join("")}</tbody></table></div>`}
+   ${pre.length?`<h3>Пререквізити й сусіди</h3><div class="tblwrap"><table><thead>${th}</thead><tbody>${pre.map(row).join("")}</tbody></table></div>`:""}
+   <p class="note small">${esc(U.passport_note)}</p>
+  </section>`;
+}
+
+/* ---------- Пререквізити ---------- */
+const NM = c => (X.names[c]||title(c));
+const SH = c => (X.short[c]||c);
+const cchip = (c, note) => `<span class="cc" title="${esc(NM(c))}"><b>${c}</b> ${esc(SH(c))}${note?` <i>· ${esc(note)}</i>`:""}</span>`;
+const VT={ok:["ok","коректно"],same:["warn","той самий семестр"],late:["bad","пізніший семестр"],absent:["bad","немає в ОП"],cosem:["warn","кореквізит в іншому семестрі"],unknown:["neu","семестр невідомий"]};
+const PLk=()=>U.prereq_links||D.links;
+const KIND={prereq:"попередня",next:"наступна",coreq:"кореквізит"};
+function linkFix(l){
+  const [a,b,k,txt,v]=l;
+  if(v==="ok") return "Зв'язок узгоджений із семестрами ОПП.";
+  if(v==="absent") return `Замінити на курс ОП з кодом або прибрати. Курсу «${txt.replace(/ — .*/,"").replace(/ \(у (РП|силабусі).*\)/,"").replace(/[«»]/g,"")}» у програмі немає.`;
+  if(v==="same") return k==="next" ? `Обидва курси в ${PS(a)} семестрі: перенести ${b} у «супутні», а не «наступні».` : `Обидва курси в ${PS(a)} семестрі: ${a} не може бути попереднім для ${b}. Перенести в «супутні» або узгодити теми між викладачами.`;
+  if(k==="next") return `${b} іде в ${PS(b)} семестрі — раніше за ${a} (${PS(a)} сем.). Прибрати з «наступних».`;
+  if(v==="unknown") return "Семестр одного з курсів невідомий: його силабуса немає в пакеті, тож порядок перевірити не можна.";
+  if(k==="coreq") return `Супутній курс має йти в тому самому семестрі, а тут ${a} — ${PS(a)} сем., ${b} — ${PS(b)} сем. Перенести в «попередні» чи «наступні» відповідно до порядку.`;
+  return `${a} читається в ${PS(a)} семестрі, а ${b} — уже в ${PS(b)}. Студент не може спиратися на курс, якого ще не мав. Прибрати з попередніх або переставити курси в ОПП.`;
+}
+let prSel=null;
+const PRG={zag:"#b07d2b",prof:"#6b7785",vb1:"#0f7a7a",vb2:"#7a4fc2"};
+let prOn=null;
+const GMODE = !!U.groups;
+const GRP = c => (U.group||U.prereq_group||{})[c];
+function gfInit(){ if(!prOn) prOn=new Set((U.groups||U.prereq_groups).map(g=>g.k)); }
+const inG = c => { if(!GMODE) return true; gfInit(); return prOn.has(GRP(c)); };
+const PS = c => (U.prereq_sem||{})[c] ?? D.sem[c] ?? null;
+function prVisible(){
+  gfInit();
+  return U.prereq_nodes.filter(c=>prOn.has(U.prereq_group[c]));
+}
+function prMap(){
+  const nodes = prVisible();
+  const hasUnk = nodes.some(c=>!PS(c)); const nCol = hasUnk?9:8;
+  const colW=hasUnk?125:138, boxW=hasUnk?113:124, boxH=40, rowH=54; const W=nCol*colW+12; const nch=hasUnk?17:21;
+  const ord = c => [ D.line.includes(c)?0:1, ["zag","prof","vb1","vb2"].indexOf(U.prereq_group[c]), U.prereq_nodes.indexOf(c) ];
+  const cmp=(a,b)=>{const A=ord(a),B=ord(b); for(let i=0;i<3;i++) if(A[i]!==B[i]) return A[i]-B[i]; return 0;};
+  const bySem={}; nodes.forEach(c=>{(bySem[PS(c)||9] ||= []).push(c)});
+  const pos={}; let maxRows=0;
+  Object.entries(bySem).forEach(([s,arr])=>{arr.sort(cmp).forEach((c,i)=>{pos[c]={x:6+(s-1)*colW+(colW-boxW)/2, y:40+i*rowH}}); maxRows=Math.max(maxRows,arr.length)});
+  const H=40+Math.max(maxRows,1)*rowH+10;
+  const st = c => { const r=D.passport.find(r=>r[0]===c); if(r) return r[6]; const inf=(U.prereq_info||{})[c]; return inf && !inf[2] ? "missing" : "ok"; };
+  const COL={ok:"var(--ok)",same:"var(--warn)",late:"var(--bad)",cosem:"var(--warn)",unknown:"var(--ink-3)"};
+  let g="";
+  for(let s=1;s<=nCol;s++){g+=`<text x="${6+(s-1)*colW+colW/2}" y="20" text-anchor="middle" font-size="12" fill="var(--ink-3)">${s<=8?s+" сем.":"сем. невідомий"}</text>`; if(s>1) g+=`<line x1="${6+(s-1)*colW}" x2="${6+(s-1)*colW}" y1="28" y2="${H}" stroke="var(--rule-soft)" ${s===9?'stroke-dasharray="4 4"':''}/>`;}
+  PLk().forEach((l,i)=>{ if(!l[1]) return;
+    const [a,b,k,txt,v]=l; const A=pos[a],B=pos[b]; if(!A||!B) return;
+    const y1=A.y+boxH/2, y2=B.y+boxH/2; let d;
+    if(v==="same"||(v==="cosem"&&A.x===B.x)) d=`M${A.x+boxW/2+8},${A.y+(B.y>A.y?boxH:0)} L${B.x+boxW/2+8},${B.y+(B.y>A.y?0:boxH)}`;
+    else if(v==="late") d=`M${A.x},${y1} C${A.x-50},${y1} ${B.x+boxW+50},${y2} ${B.x+boxW},${y2}`;
+    else d=`M${A.x+boxW},${y1} C${A.x+boxW+45},${y1} ${B.x-45},${y2} ${B.x},${y2}`;
+    g+=`<g class="edge" data-i="${i}" data-a="${a}" data-b="${b}" tabindex="0" role="button" aria-label="${esc(a+" → "+b)}"><path d="${d}" fill="none" stroke="transparent" stroke-width="12"/><path class="ln" d="${d}" fill="none" stroke="${COL[v]}" stroke-width="${v==="ok"||v==="unknown"?1.3:2.2}" ${v==="unknown"||v==="cosem"?'stroke-dasharray="5 3"':""} marker-end="url(#m-${v})"/></g>`;
+  });
+  nodes.forEach(c=>{const p=pos[c]; const s=st(c); const inL=D.line.includes(c);
+    const nIss = PLk().filter(l=>(l[0]===c||l[1]===c)&&l[4]!=="ok"&&l[4]!=="unknown").length + ((D.passport.find(r=>r[0]===c)||[])[12]||[]).length;
+    g+=`<g class="node" data-c="${c}" tabindex="0" role="button" aria-label="${esc(NM(c))}"><rect x="${p.x}" y="${p.y}" width="${boxW}" height="${boxH}" rx="6" fill="${inL?"var(--deep-soft)":"var(--panel)"}" stroke="${s==="missing"?"var(--bad)":inL?"var(--deep)":"var(--rule)"}" ${s==="missing"?'stroke-dasharray="4 3"':''}/>
+     <rect x="${p.x}" y="${p.y+6}" width="3.5" height="${boxH-12}" rx="1.5" fill="${PRG[U.prereq_group[c]]}"/>
+     <text x="${p.x+9}" y="${p.y+16}" font-size="11.5" font-weight="600" fill="var(--ink)" font-family="IBM Plex Mono, monospace">${c}</text>
+     <text x="${p.x+9}" y="${p.y+31}" font-size="11" fill="var(--ink-2)">${esc(SH(c).slice(0,nch))}</text>
+     ${nIss?`<circle cx="${p.x+boxW-10}" cy="${p.y+12}" r="8" fill="var(--bad)"/><text x="${p.x+boxW-10}" y="${p.y+16}" text-anchor="middle" font-size="10" font-weight="600" fill="var(--paper)">${nIss}</text>`:""}</g>`;});
+  const marker = k => `<marker id="m-${k}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${COL[k]}"/></marker>`;
+  const cred = nodes.reduce((a,c)=>a+(((U.prereq_info||{})[c]||[0])[0]||0),0);
+  const nE = PLk().filter(l=>l[1]&&pos[l[0]]&&pos[l[1]]).length;
+  return `<p class="small muted" style="margin:0 0 6px">Показано ${nodes.length} з ${U.prereq_nodes.length} компонентів · ${cred.toLocaleString("uk-UA")} кр. · зв'язків на карті: ${nE}</p>
+   <svg id="prsvg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMin meet" style="display:block;width:100%;height:auto;max-width:${Math.round(W*1.6)}px;margin:0 auto" role="group" aria-label="Карта пререквізитів">${["ok","same","late","cosem","unknown"].map(marker).join("")}${g}</svg>`;
+}
+function prFilters(){
+  gfInit();
+  const cnt=k=>U.prereq_nodes.filter(c=>U.prereq_group[c]===k).length;
+  const all = prOn.size===U.prereq_groups.length;
+  return `<div class="prf" role="group" aria-label="Фільтр циклів">
+   <button type="button" data-f="all" aria-pressed="${all}">Усі · ${U.prereq_nodes.length}</button>
+   ${U.prereq_groups.map(g=>`<button type="button" data-f="${g.k}" aria-pressed="${prOn.has(g.k)}" title="${esc(g.s)}"><span class="sw" style="background:${PRG[g.k]}"></span>${esc(g.l)} · ${cnt(g.k)}</button>`).join("")}
+  </div>`;
+}
+function vPrereq(){
+  const bad = PLk().map((l,i)=>[l,i]).filter(([l])=>l[4]!=="ok"&&l[4]!=="unknown");
+  return `<section class="view">
+   <div class="sechead"><span class="eyebrow">Звіт 2</span><h2>Карта пререквізитів</h2>
+   <p class="muted">${esc(U.prereq_lede)}</p></div>
+   ${GMODE?"":`<div id="prFilt">${prFilters()}</div>`}
+   <div class="legend"><span><span class="sw" style="background:var(--ok)"></span>коректний зв'язок</span><span><span class="sw" style="background:var(--warn)"></span>той самий семестр</span><span><span class="sw" style="background:var(--bad)"></span>посилання на пізніший семестр</span><span><span class="sw" style="border:1.5px dashed var(--warn)"></span>кореквізит в іншому семестрі</span><span><span class="sw" style="border:1.5px dashed var(--ink-3)"></span>семестр невідомий</span>${GMODE?"":`<span><span class="sw" style="background:var(--deep-soft);border-color:var(--deep)"></span>курс лінії аудиту</span>`}<span><span class="sw" style="border:1.5px dashed var(--bad)"></span>${esc(U.missing_label)}</span><span>смужка ліворуч — цикл ОП</span></div>
+   <div class="tblwrap prmap" style="padding:8px" id="prWrap">${prMap()}</div>
+   <div class="detail" id="prDetail" aria-live="polite"></div>
+   <div class="grid g2">
+    <div class="card"><h3>Усі розриви · ${bad.length}</h3><p class="small muted">Клацніть рядок, щоб показати його на карті.</p>
+     <div class="tblwrap noscroll"><table class="fixed"><thead><tr><th>Зв'язок</th><th>Як написано в РП</th><th>Проблема</th></tr></thead><tbody>
+     ${bad.map(([l,i])=>`<tr class="pick" data-i="${i}" tabindex="0"><td>${cchip(l[0])}<div class="small muted">${KIND[l[2]]} для</div>${l[1]?cchip(l[1]):'<span class="small">—</span>'}</td><td class="small">${esc(l[3])}</td><td><span class="chip ${VT[l[4]][0]}">${VT[l[4]][1]}</span></td></tr>`).join("")}
+     </tbody></table></div></div>
+    <div class="card"><h3>Що видно з карти</h3>
+     <ul class="clean">${U.prereq_notes.map(x=>`<li><b>${esc(x.b)}</b> ${esc(x.t)}</li>`).join("")}</ul></div>
+   </div>
+  </section>`;
+}
+function prDescribe(){
+  const el=$("#prDetail"); if(!el) return;
+  const svg=$("#prsvg");
+  svg.querySelectorAll(".node,.edge").forEach(n=>n.classList.remove("on","dim"));
+  if(!prSel){ el.innerHTML=`<p class="muted small">Оберіть курс або стрілку на карті.</p>`; return; }
+  if(prSel.t==="edge"){
+    const l=PLk()[prSel.i]; const [a,b,k,txt,v]=l;
+    svg.querySelectorAll(".node,.edge").forEach(n=>n.classList.add("dim"));
+    svg.querySelectorAll(`.edge[data-i="${prSel.i}"],.node[data-c="${a}"],.node[data-c="${b}"]`).forEach(n=>{n.classList.remove("dim");n.classList.add("on")});
+    el.innerHTML=`<div class="dhead"><span class="chip ${VT[v][0]}">${VT[v][1]}</span><h3>${cchip(a)} → ${b?cchip(b):"курс поза ОПП"}</h3></div>
+     <div class="grid g3"><div><div class="wavehead">Що написано в силабусі</div><p>«${esc(txt)}» — ${KIND[k]}</p></div>
+     <div><div class="wavehead">${esc(U.sem_source)}</div><p>${a}: <b>${PS(a)??"?"}</b>${b?` · ${b}: <b>${PS(b)??"?"}</b>`:""}</p></div>
+     <div><div class="wavehead">Як виправити</div><p>${esc(linkFix(l))}</p></div></div>`;
+    return;
+  }
+  const c=prSel.c; const r=D.passport.find(x=>x[0]===c);
+  const own=PLk().map((l,i)=>[l,i]).filter(([l])=>l[0]===c||l[1]===c);
+  svg.querySelectorAll(".node,.edge").forEach(n=>n.classList.add("dim"));
+  svg.querySelectorAll(`.node[data-c="${c}"],.edge[data-a="${c}"],.edge[data-b="${c}"]`).forEach(n=>{n.classList.remove("dim");n.classList.add("on")});
+  own.forEach(([l])=>{[l[0],l[1]].forEach(x=>{const n=svg.querySelector(`.node[data-c="${x}"]`); if(n){n.classList.remove("dim")}})});
+  const status = !r ? (((U.prereq_info||{})[c]||[0,0,true])[2]?`<span class="chip neu">поза лінією аудиту</span>`:`<span class="chip bad">${esc(U.missing_label)}</span>`) : r[6]==="missing" ? `<span class="chip bad">${esc(U.missing_label)}</span>` : `<span class="chip ok">${esc(U.doc_label)} є</span>`;
+  el.innerHTML=`<div class="dhead">${status}<h3><span class="code">${c==="ПБКР"?"":c}</span> ${esc(NM(c))}</h3></div>
+   <div class="grid g3">
+    <div><div class="wavehead">Паспорт</div>${r?`<p>${r[3]??"?"} семестр · ${r[4]} кр. · ${r[5]} за ОП</p>${r[6]==="ok"?`<p class="small muted">У документі: ${r[9]||"форма контролю не визначена"}</p>`:""}`:`<p>${PS(c)??"?"} семестр · ${((U.prereq_info||{})[c]||[])[0]??"?"} кр. · ${((U.prereq_info||{})[c]||[])[1]||""}</p>${((U.prereq_info||{})[c]||[0,0,true])[2]?"":`<p class="small muted">Силабуса в пакеті немає</p>`}`}</div>
+    <div><div class="wavehead">Неточності в документі</div>${r&&r[12].length?`<ul class="clean small">${r[12].map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:'<p class="small muted">немає даних</p>'}</div>
+    <div><div class="wavehead">Зв'язки · ${own.length}</div>${own.length?`<ul class="clean small">${own.map(([l,i])=>`<li><a href="#prereq" class="elink" data-i="${i}">${l[0]} → ${l[1]||"поза ОПП"}</a> <span class="chip ${VT[l[4]][0]}">${VT[l[4]][1]}</span></li>`).join("")}</ul>`:'<p class="small muted">РП інших курсів на нього не посилаються</p>'}</div>
+   </div>`;
+}
+function prBindSvg(){
+  const svg=$("#prsvg"); if(!svg) return;
+  const pick=e=>{const ed=e.target.closest(".edge"), nd=e.target.closest(".node"); if(ed){prSel={t:"edge",i:+ed.dataset.i}} else if(nd){prSel={t:"node",c:nd.dataset.c}} else return; prDescribe();};
+  svg.addEventListener("click",pick);
+  svg.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pick(e)}});
+}
+function prRedraw(){
+  if($("#prFilt")) $("#prFilt").innerHTML=prFilters(); if($("#gfBar")) $("#gfBar").innerHTML=prFilters(); $("#prWrap").innerHTML=prMap(); prBindSvg();
+  if(prSel&&prSel.t==="node"&&!$(`#prsvg .node[data-c="${prSel.c}"]`)) prSel=null;
+  if(prSel&&prSel.t==="edge"&&!$(`#prsvg .edge[data-i="${prSel.i}"]`)) prSel=null;
+  prDescribe();
+}
+function prBind(){
+  prBindSvg();
+  if($("#prFilt")) $("#prFilt").addEventListener("click",e=>{const b=e.target.closest("button[data-f]"); if(!b) return; const f=b.dataset.f;
+    if(f==="all"){prOn=new Set(U.prereq_groups.map(g=>g.k));}
+    else { if(prOn.has(f)){ if(prOn.size>1) prOn.delete(f);} else prOn.add(f); }
+    prRedraw();});
+  document.querySelectorAll("tr.pick").forEach(tr=>{const go=()=>{prSel={t:"edge",i:+tr.dataset.i}; if(!$(`#prsvg .edge[data-i="${tr.dataset.i}"]`)){prOn=new Set(U.prereq_groups.map(g=>g.k)); const k=prSel; prRedraw(); prSel=k;} prDescribe(); $("#prsvg").scrollIntoView({behavior:"smooth",block:"center"});}; tr.addEventListener("click",go); tr.addEventListener("keydown",e=>{if(e.key==="Enter")go()});});
+  $("#prDetail").addEventListener("click",e=>{const a=e.target.closest(".elink"); if(!a) return; e.preventDefault(); prSel={t:"edge",i:+a.dataset.i}; prDescribe();});
+  if(!prSel) prSel={t:"node",c:U.prereq_default};
+  prDescribe();
+}
+
+
+/* ---------- Теми силабусів ---------- */
+let tpMode="matrix", ctSel=null;
+const CTS={repeat:["bad","повтор"],dev:["warn","схожа, є раніше"],near:["neu","схожа, паралельно чи пізніше"],unique:["ok","унікальна"]};
+function ctCourses(){ return ORDER.flatMap(o=>o[1]).filter(c=>U.ctopics[c]&&inG(c)); }
+function ctBar(l){ const n=l.length||1; const k=s=>l.filter(x=>x[2]===s).length;
+  return `<div class="ctbar">${["unique","dev","near","repeat"].map(s=>k(s)?`<span class="b-${s}" style="width:${k(s)/n*100}%" title="${CTS[s][1]}: ${k(s)}"></span>`:"").join("")}</div>`; }
+function ctDetail(){
+  const c=ctSel; const l=U.ctopics[c]||[]; const k=s=>l.filter(x=>x[2]===s).length;
+  if(!l.length) return `<p class="muted">У силабусі ${c} теми не виділено (немає розділу з переліком тем).</p>`;
+  return `<div class="dhead"><h3><span class="code">${c}</span> ${esc(NM(c))}</h3></div>
+   <p class="small">${l.length} тем: <span class="chip ok">унікальних ${k("unique")}</span> <span class="chip bad">повторів ${k("repeat")}</span> <span class="chip warn">схожих раніше ${k("dev")}</span> <span class="chip neu">схожих паралельно чи пізніше ${k("near")}</span></p>
+   <div class="tblwrap noscroll"><table class="fixed ctt"><colgroup><col style="width:36px"><col style="width:40%"><col style="width:150px"><col></colgroup>
+   <thead><tr><th>#</th><th>Тема в силабусі</th><th>Статус</th><th>Де ще є схожа тема</th></tr></thead><tbody>
+   ${l.map(([t,b,st,h],i)=>`<tr class="ct-${st}"><td class="num">${i+1}</td><td><b>${esc(t)}</b>${b?`<div class="small muted">${esc(b)}</div>`:""}</td>
+     <td><span class="chip ${CTS[st][0]}">${CTS[st][1]}</span></td>
+     <td>${h.length?h.map(([d,ot,sc])=>`<div class="cth">${cchip(d)} <span class="small num">${Math.round(sc*100)}%</span> <span class="small muted">· ${PS(d)??"?"} сем.</span><div class="small">${esc(ot)}</div></div>`).join(""):'<span class="small muted">—</span>'}</td></tr>`).join("")}
+   </tbody></table></div>`;
+}
+function vCTopics(){
+  const cs=ctCourses(); if(!ctSel||!cs.includes(ctSel)) ctSel=cs.includes(U.default_course)?U.default_course:cs[0];
+  const all=cs.flatMap(c=>U.ctopics[c]); const k=s=>all.filter(x=>x[2]===s).length;
+  return `<p class="muted">${esc(U.ctopics_lede)}</p>
+   <div class="grid g4">${["unique","repeat","dev","near"].map(s=>`<div class="tile"><span class="eyebrow">${CTS[s][1]}</span><div class="big">${k(s)}</div><span class="small muted">з ${all.length} тем у ${cs.length} силабусах</span></div>`).join("")}</div>
+   <div class="ctgrid">
+    <div class="card ctlist"><h3>Силабуси</h3><p class="small muted">Смужка: зелене — унікальні теми, жовте — схожі раніше, сіре — схожі паралельно чи пізніше, червоне — повтори. Клацніть курс.</p>
+     ${ORDER.map(([g,l0])=>[g,l0.filter(c=>cs.includes(c))]).filter(([g,l])=>l.length).map(([g,l])=>`<div class="wavehead" style="margin-top:10px">${esc(g)}</div>`+l.map(c=>{const t=U.ctopics[c]; const r=t.filter(x=>x[2]==="repeat").length;
+       return `<button type="button" class="ctrow" data-c="${c}" aria-pressed="${c===ctSel}"><span class="ctl"><b class="code">${c}</b> ${esc(SH(c))}</span><span class="small num">${t.length}${r?` · <b style="color:var(--bad)">${r}</b>`:""}</span>${ctBar(t)}</button>`}).join("")).join("")}
+    </div>
+    <div id="ctDetail" style="min-width:0">${ctDetail()}</div>
+   </div>`;
+}
+function ctBind(){
+  document.querySelectorAll(".ctrow").forEach(b=>b.addEventListener("click",()=>{ctSel=b.dataset.c; $("#ctDetail").innerHTML=ctDetail(); document.querySelectorAll(".ctrow").forEach(x=>x.setAttribute("aria-pressed",x.dataset.c===ctSel)); $("#ctDetail").scrollIntoView({behavior:"smooth",block:"nearest"});}));
+}
+
+/* ---------- Матриця тем ---------- */
+let tpSel=null;
+function vTopics(){
+  const sw = U.ctopics?`<div class="seg tpmode" role="group" aria-label="Режим"><button type="button" data-m="matrix" aria-pressed="${tpMode==="matrix"}">Матриця програми</button><button type="button" data-m="course" aria-pressed="${tpMode==="course"}">Теми курсів і повтори</button></div>`:"";
+  if(U.ctopics && tpMode==="course") return `<section class="view"><div class="sechead"><span class="eyebrow">Звіт 3</span><h2>Теми силабусів: що унікальне, що повторюється</h2></div>${sw}${vCTopics()}</section>`;
+  const cols=(U.topic_cols||D.cols).filter(inG), pre=cols.filter(c=>!D.line.includes(c)), ln=cols.filter(c=>D.line.includes(c));
+  const cell=(t,c)=>{ if(!(c in t[2])) return `<td class="cell v0" data-t="${t[0]}" data-c="${c}"></td>`; const v=t[2][c];
+    if(v===null) return `<td class="cell vN pk" data-t="${t[0]}" data-c="${c}" tabindex="0" title="${esc(SH(c))}: ${esc(U.missing_label)}"><span>?</span></td>`;
+    return `<td class="cell v${v} pk" data-t="${t[0]}" data-c="${c}" tabindex="0" title="${esc(SH(c))}: ${v===2?esc(U.scale[2]):esc(U.scale[1])}"><span>${v===2?"●":"○"}</span></td>`;};
+  const visT = t => !GMODE || cols.some(c=>c in t[2]) || Object.values(t[2]).filter(v=>v).length===0;
+  const ncol = pre.length + ln.length + 3;
+  const blocks = U.topic_blocks || [["", D.topics.map(t=>t[0])]];
+  const TT = Object.fromEntries(D.topics.map(t=>[t[0],t]));
+  const nVis = D.topics.filter(visT).length;
+  const rowOf=t=>{const n=Object.values(t[2]).filter(v=>v).length;
+    return `<tr data-row="${t[0]}"><td class="tname pk" data-t="${t[0]}" tabindex="0">${esc(t[1])}</td>${pre.map(c=>cell(t,c)).join("")}<td class="gap"></td>${ln.map(c=>cell(t,c)).join("")}
+     <td class="c"><span class="chip ${n>=3?"bad":n===0?"warn":"neu"}">${n===0?"ніде":n>=3?`у ${n} курсах`:n}</span></td></tr>`};
+  const rows=blocks.map(([bn,keys])=>{const ts=keys.map(k=>TT[k]).filter(Boolean).filter(visT); if(!ts.length) return "";
+    return (bn?`<tr class="tblock"><td colspan="${ncol}">${esc(bn)} <span class="muted">· ${ts.length} тем</span></td></tr>`:"")+ts.map(rowOf).join("")}).join("");
+  const hdr=c=>`<th class="rot" data-col="${c}" title="${esc(NM(c))}"><span class="code">${c}</span> ${esc(SH(c))}</th>`;
+  return `<section class="view">
+   <div class="sechead"><span class="eyebrow">Звіт 3</span><h2>Матриця тем: дублювання і прогалини</h2>
+   <p class="muted">${nVis} тем × ${cols.length} курсів${GMODE?" (з урахуванням перемикачів)":""}. ${esc(U.topics_lede)}</p></div>${sw}
+   <div class="legend"><span><span class="sw v2"></span>● ${esc(U.scale[2])}</span><span><span class="sw v1"></span>○ ${esc(U.scale[1])}</span><span><span class="sw v0"></span>теми немає</span><span><span class="sw vN"></span>? ${esc(U.missing_label)}, а тема очікується</span><span><span class="chip bad">у 3 курсах</span> — перекриття без поділу ролей</span></div>
+   <div>
+    <div class="tblwrap"><table class="hm" id="tpTable"><thead>
+     <tr><th></th><th class="grp" colspan="${pre.length}">${pre.length?"сусіди":""}</th><th class="gap"></th><th class="grp" colspan="${ln.length}">${esc(U.line_label)}</th><th></th></tr>
+     <tr><th>Тема</th>${pre.map(hdr).join("")}<th class="gap"></th>${ln.map(hdr).join("")}<th class="c">Скільки курсів</th></tr></thead>
+     <tbody>${rows}</tbody></table></div>
+    <aside class="detail float" id="tpDetail" aria-live="polite" hidden></aside>
+   </div>
+   <div class="grid g2">
+    <div class="card"><h3>Дублювання</h3><ul class="clean">${U.topic_dups.map(x=>`<li><b>${esc(x.b)}</b> ${esc(x.t)}</li>`).join("")}</ul></div>
+    <div class="card"><h3>Прогалини</h3><ul class="clean">${U.topic_gaps.map(x=>`<li><b>${esc(x.b)}</b> ${esc(x.t)}</li>`).join("")}</ul></div>
+   </div>
+  </section>`;
+}
+function tpDescribe(){
+  const el=$("#tpDetail"); if(!el||!tpSel) return; el.hidden=false;
+  const t=D.topics.find(x=>x[0]===tpSel.t); const ev=X.evidence[t[0]]||{};
+  document.querySelectorAll("#tpTable .sel, #tpTable .rowsel, #tpTable .colsel").forEach(n=>n.classList.remove("sel","rowsel","colsel"));
+  document.querySelectorAll(`#tpTable tr[data-row="${t[0]}"]`).forEach(n=>n.classList.add("rowsel"));
+  if(tpSel.c){ document.querySelectorAll(`#tpTable [data-col="${tpSel.c}"], #tpTable td[data-c="${tpSel.c}"]`).forEach(n=>n.classList.add("colsel"));
+    const td=document.querySelector(`#tpTable td[data-t="${t[0]}"][data-c="${tpSel.c}"]`); if(td) td.classList.add("sel"); }
+  const has=Object.entries(t[2]).filter(([c,v])=>v);
+  const pend=Object.entries(t[2]).filter(([c,v])=>v===null);
+  const owner=D.owner[t[0]];
+  const lvl=v=>v===2?`<span class="chip v2c">● ${esc(U.scale[2])}</span>`:v===1?`<span class="chip v1c">○ ${esc(U.scale[1])}</span>`:v===null?`<span class="chip neu">? ${esc(U.missing_label)}</span>`:`<span class="chip neu">теми немає</span>`;
+  let focus="";
+  if(tpSel.c){ const c=tpSel.c, v=t[2][c];
+    focus=`<div class="focus"><div class="wavehead">Обраний курс</div><p>${cchip(c)}</p><p>${lvl(c in t[2]?v:0)}</p><p class="small">${esc(ev[c]||"У силабусі цієї теми немає.")}</p>
+     ${has.length>1&&v?`<p class="small"><b>Перекривається з:</b> ${has.filter(([x])=>x!==c).map(([x])=>cchip(x)).join(" ")}</p>`:""}</div>`; }
+  el.innerHTML=`<button type="button" class="xclose" aria-label="Закрити">×</button><div class="fgrid">
+   <div class="fcol"><div class="wavehead">Тема</div><h3>${esc(t[1])}</h3>
+   <p>${has.length===0?`<span class="chip warn">прогалина — немає в жодному курсі</span>`:has.length>=3?`<span class="chip bad">перекриття: ${has.length} курсів</span>`:`<span class="chip neu">${has.length} курс(и)</span>`}</p>
+   ${focus}</div>
+   <div class="fcol"><div class="wavehead">Де є зараз</div>
+   ${has.length?`<ul class="evl">${has.map(([c,v])=>`<li class="${c===tpSel.c?"cur":""}"><div>${cchip(c)} ${v===2?"●":"○"}</div><div class="small muted">${esc(ev[c]||"")}</div></li>`).join("")}</ul>`:`<p class="small">${esc(U.gap_text)}</p>`}
+   ${pend.length?`<div class="wavehead">Очікується в документах, яких немає</div><ul class="evl">${pend.map(([c])=>`<li><div>${cchip(c)}</div><div class="small muted">${esc(ev[c]||"")}</div></li>`).join("")}</ul>`:""}</div>
+   <div class="fcol"><div class="wavehead">Після хвилі 2</div><p><b>Власник теми:</b> ${ownerChips(owner)}</p><p class="small muted">${esc(t[3]||"")}</p></div></div>`;
+}
+function tpBind(){
+  const tb=$("#tpTable"); if(!tb) return;
+  const go=e=>{const n=e.target.closest(".pk"); if(!n) return; tpSel={t:n.dataset.t, c:n.dataset.c||null}; tpDescribe();};
+  tb.addEventListener("click",go); tb.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go(e)}});
+  floatClose("#tpDetail",()=>{tpSel=null; document.querySelectorAll("#tpTable .sel,#tpTable .rowsel,#tpTable .colsel").forEach(n=>n.classList.remove("sel","rowsel","colsel"));});
+  tpDescribe();
+}
+
+/* ---------- Ринок ---------- */
+const ROLES=U.roles;
+const ownerChips=o=>(o||"").split(" → ").map(x=>/^(ОК|ВБ)\d/.test(x.trim())?cchip(x.trim().split(" ")[0], x.trim().split(" ").slice(1).join(" ")):esc(x)).join(" → ");
+function rolesHtml(){return `<div class="roles">${ROLES.map(r=>`<div class="role"><span class="eyebrow">${esc(r.alt)}</span><h3>${esc(r.n)}</h3><div class="med">${r.med}</div>${r.tr?`<div class="tr ${r.tr[0]}">${r.tr[0]==="up"?"▲":"▼"} ${esc(r.tr[1])}</div>`:""}
+ ${r.lad[0]!=="—"?`<div class="ladder">${r.lad.map((v,i)=>`<div>${esc((r.ladl||["Junior","Middle","Senior"])[i])}<b>${esc(v)}</b></div>`).join("")}</div>`:`<p class="small muted">${esc(U.no_ladder)}</p>`}
+ <p class="small">${esc(r.dem)}</p><div><div class="wavehead">Лінія дає</div><div class="ccl">${r.now.map(([c,n])=>cchip(c,n)).join("")}</div></div><p class="small"><b>Бракує:</b> ${esc(r.gap)}</p>${r.src?`<p class="small muted">${r.src}</p>`:""}</div>`).join("")}${U.roles_abroad||""}</div>
+ <p class="small muted">${esc(U.roles_note)}</p>`;}
+
+function vMarket(){
+  const covChip=v=>v>=1?`<span class="chip ok">сильне</span>`:v>0?`<span class="chip warn">часткове</span>`:`<span class="chip bad">прогалина</span>`;
+  const where=lst=>lst.length?lst.map(([c,n])=>cchip(c,n)).join(""):`<span class="small muted">ніде</span>`;
+  const bar=(v,col)=>`<div class="small num">${v}%</div><div class="bar"><span style="width:${v}%;background:${col}"></span></div>`;
+  const rows=U.skills_joint.map(s=>`<tr><td style="min-width:170px"><b>${esc(s.n)}</b>${s.line?"":' <span class="small muted">(інші лінії)</span>'}</td>
+     <td style="min-width:100px">${bar(s.ua,"var(--deep)")}</td><td style="min-width:100px">${bar(s.fz,"var(--after)")}</td><td style="min-width:100px">${bar(s.tot,"var(--ink-2)")}</td>
+     ${s.line?`<td style="min-width:220px">${covChip(s.now)}<div class="ccl">${where(s.w[0])}</div></td><td style="min-width:220px">${s.after!==s.now?covChip(s.after):`<span class="small muted">без змін</span>`}<div class="ccl">${where(s.w[1])}</div></td>`
+      :`<td colspan="2"><span class="small muted">навчають інші лінії програми</span></td>`}</tr>`).join("");
+  return `<section class="view">
+   <div class="sechead"><span class="eyebrow">Звіт 4</span><h2>${esc(U.market_title)}</h2>
+   <p class="muted">${esc(U.market_lede)}</p></div>
+   <h3>${esc(U.roles_title)}</h3>
+   ${rolesHtml()}
+   <h3>${esc(U.skills_title)}</h3>
+   <div class="grid xtiles x2">${U.market_tiles.map(xtile).join("")}</div>
+   <p class="note">${esc(U.market_note)}</p>
+   <div class="tblwrap"><table><thead><tr><th>Одиниця попиту</th>${U.joint_cols.map(c=>`<th>${esc(c)}</th>`).join("")}<th>Лінія зараз · де</th><th>Після хвилі 2 · де</th></tr></thead><tbody>${rows}</tbody></table></div>
+   <p class="small muted">${esc(U.market_foot)}</p>
+   ${U.vacancies_html||""}
+  </section>`;
+}
+
+/* ---------- Університети ---------- */
+let unSel=null;
+function uniCourse(u,t){ const m=(X.uni_map||{})[u[0]+"|"+t]; if(m) return m; const cs=X.uni_courses[u[0]]||[]; return cs.length?`${cs[0][0]} «${cs[0][1]}»`:u[1]; }
+function vUnis(){
+  const cell=(u,t,v)=>v==null?`<td class="cell vN" title="немає даних"><span>?</span></td>`:`<td class="cell v${v} ${v?"pk":""}" ${v?`data-u="${esc(u[0])}" data-t="${t}" tabindex="0" title="${esc(uniCourse(u,t))}"`:""}><span>${v===2?"●":v===1?"○":""}</span></td>`;
+  const rows=D.topics.filter(t=>(D.uni_t[t[0]]||[]).some(x=>x!=null)).map(t=>{const u=D.uni_t[t[0]]; const n=u.filter(x=>x).length; const cons=D.consensus.includes(t[0]);
+    const has=Object.entries(t[2]).filter(([c,v])=>v);
+    return `<tr><td style="min-width:200px" class="tname pk" data-t="${t[0]}" tabindex="0" role="button" title="Показати, як тему вчать провідні програми">${esc(t[1])} ${cons?'<span class="chip neu">консенсус</span>':''}</td>${D.unis.map((un,i)=>cell(un,t[0],u[i])).join("")}<td class="c num">${n}/${D.unis.length}</td>
+     <td style="min-width:240px"><div class="ccl">${has.length?has.map(([c,v])=>cchip(c,v===2?U.scale_short[2]:U.scale_short[1])).join(""):'<span class="chip bad">немає в лінії</span>'}</div></td></tr>`}).join("");
+  return `<section class="view">
+   <div class="sechead"><span class="eyebrow">Звіт 5</span><h2>${esc(U.unis_title)}</h2>
+   <p class="muted">${esc(U.unis_lede)}</p></div>
+   <div class="legend"><span>● основна тема з практикою</span><span>○ згадка або частина теми</span><span><span class="sw vN"></span>немає публічних даних</span></div>
+   <aside class="detail float" id="unDetail" aria-live="polite" hidden></aside>
+   <div class="tblwrap"><table class="hm" id="unTable"><thead><tr><th>Тема</th>${D.unis.map(u=>`<th class="uh"><b>${esc(u[0])}</b><span>${esc((X.uni_short||{})[u[0]]||X.uni_courses[u[0]].map(x=>x[0]).filter((v,i,a)=>a.indexOf(v)===i).join(" + "))}</span></th>`).join("")}<th class="c">Разом</th><th>Де в нашій програмі зараз</th></tr></thead><tbody>${rows}</tbody></table></div>
+   <div class="grid g2">
+    <div class="card"><h3>Що показує порівняння</h3><ul class="clean">${U.unis_notes.map(x=>`<li>${x}</li>`).join("")}</ul></div>
+    <div class="card"><h3>Курси порівняння</h3><ul class="clean small">${D.unis.map(u=>`<li><b>${esc(u[0])}</b> <span class="muted">(${esc(u[2])})</span> — ${X.uni_courses[u[0]].map(x=>`${esc(x[0])} «${esc(x[1])}»`).join("; ")}${X.uni_url&&X.uni_url[u[0]]?` · <a href="${esc(X.uni_url[u[0]])}" target="_blank" rel="noopener">план</a>`:""}</li>`).join("")}</ul>
+     <p class="small muted">${esc(U.unis_foot)}</p></div>
+   </div>
+  </section>`;
+}
+function unBind(){
+  const tb=$("#unTable"); if(!tb) return;
+  const go=e=>{const n=e.target.closest(".pk"); if(!n) return; const t=D.topics.find(x=>x[0]===n.dataset.t);
+    tb.querySelectorAll(".sel,.rowsel").forEach(x=>x.classList.remove("sel","rowsel")); n.classList.add("sel");
+    const has=Object.entries(t[2]).filter(([c,v])=>v);
+    if(!n.dataset.u){ const ut=D.uni_t[t[0]]||[]; const cnt=ut.filter(x=>x).length; n.closest("tr").classList.add("rowsel");
+      const lv=v=>v===2?'<span class="chip v2c">● окремий курс</span>':v===1?'<span class="chip v1c">○ частина курсу</span>':v===0?'<span class="chip neu">немає в плані</span>':'<span class="chip neu">? немає даних</span>';
+      const ud=$("#unDetail"); ud.hidden=false; ud.innerHTML=`<button type="button" class="xclose" aria-label="Закрити">×</button><div class="fgrid">
+       <div><div class="wavehead">Тема</div><h3>${esc(t[1])}</h3><p>${cnt>=5?'<span class="chip ok">консенсус</span> ':""}<span class="chip neu">${cnt} із ${D.unis.length} програм</span></p>
+        <div class="wavehead">У нашій програмі</div><div class="ccl">${has.length?has.map(([c,v])=>cchip(c,v===2?U.scale_short[2]:U.scale_short[1])).join(""):'<span class="chip bad">немає</span>'}</div></div>
+       <div style="grid-column:span 2"><div class="wavehead">Як учать провідні програми</div><ul class="evl">${D.unis.map((u,i)=>`<li><div><b>${esc(u[0])}</b> <span class="small muted">${esc(u[2])}</span> ${lv(ut[i])}</div>${ut[i]?`<div class="small">${esc(uniCourse(u,t[0]))}</div>`:""}</li>`).join("")}</ul></div></div>`;
+      return; }
+    const u=D.unis.find(x=>x[0]===n.dataset.u);
+    const ud=$("#unDetail"); ud.hidden=false; ud.innerHTML=`<button type="button" class="xclose" aria-label="Закрити">×</button><div class="fgrid"><div><div class="wavehead">${esc(u[0])} · ${esc(u[2])}</div><p><b>${esc(uniCourse(u,t[0]))}</b></p><p class="small muted">${esc(t[1])}</p></div>
+      <div><div class="wavehead">У нашій програмі</div><div class="ccl">${has.length?has.map(([c,v])=>cchip(c,v===2?U.scale_short[2]:U.scale_short[1])).join(""):'<span class="chip bad">немає</span>'}</div></div>
+      <div><div class="wavehead">Після хвилі 2</div><p>Власник: ${ownerChips(D.owner[t[0]])}</p></div></div>`;};
+  tb.addEventListener("click",go); tb.addEventListener("keydown",e=>{if(e.key==="Enter")go(e)});
+  floatClose("#unDetail",()=>tb.querySelectorAll(".sel").forEach(x=>x.classList.remove("sel")));
+}
+function floatClose(sel,cb){const el=$(sel); new MutationObserver(()=>{document.body.style.paddingBottom=el.hidden?"":"46vh"}).observe(el,{attributes:true,attributeFilter:["hidden"]}); el.addEventListener("click",e=>{if(e.target.closest(".xclose")){el.hidden=true; cb&&cb();}}); document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!el.hidden){el.hidden=true; cb&&cb();}});}
+
+/* ---------- Метрики ---------- */
+let curCourse=U.default_course;
+function vMetrics(){
+  const P=D.prog;
+  const progRows=P.map(p=>{const exp=EXP(p.s[1],p.s[2]);
+   const fmt=v=>v==null?"н/д":p.key==="P8"?f1(v):pct(v);
+   return `<tr><td class="code">${p.key}</td><td>${esc(p.name)}<div class="small muted">${esc(p.note)}</div></td>
+    <td class="r"><span class="zone ${zone(p.s[0])}">${fmt(p.v[0])}</span></td><td class="r"><span class="zone ${zone(p.s[1])}">${fmt(p.v[1])}</span></td><td class="r"><span class="zone ${zone(p.s[2])}">${fmt(p.v[2])}</span></td>
+    <td class="r num">${f1(p.s[0])} → ${f1(p.s[2])}</td>${K!=null?`<td class="r num">${f1(exp)}</td>`:""}</tr>`}).join("");
+  return `<section class="view">
+   <div class="sechead"><span class="eyebrow">Звіт 6</span><h2>Метрики до і після</h2>
+   <p class="muted">${esc(U.metrics_lede)}</p></div>
+   <h3>Програмний рівень</h3>
+   <div class="tblwrap"><table><thead><tr><th>Код</th><th>Метрика</th><th class="r">Зараз</th><th class="r">Хвиля 1</th><th class="r">Хвиля 2</th><th class="r">Бал</th>${K!=null?'<th class="r">Очікувано</th>':""}</tr></thead><tbody>${progRows}
+    <tr><td></td><td><b>Індекс програми</b></td><td class="r"><span class="zone ${zone(D.prog_index[0])}">${f1(D.prog_index[0])}</span></td><td class="r"><span class="zone ${zone(D.prog_index[1])}">${f1(D.prog_index[1])}</span></td><td class="r"><span class="zone ${zone(D.prog_index[2])}">${f1(D.prog_index[2])}</span></td><td></td>${K!=null?`<td class="r num"><b>${f1(EXP(D.prog_index[1],D.prog_index[2]))}</b></td>`:""}</tr>
+   </tbody></table></div>
+   <h3>Курсовий рівень · 24 метрики</h3><p class="small muted">${esc(U.metrics_course_note)}</p>
+   <div class="cseg" id="cseg">${ORDER.map(([g,l0])=>[g,l0.filter(inG)]).filter(([g,l])=>l.length).map(([g,l])=>`<div class="cgrp"><span class="eyebrow">${esc(g)}</span><div class="seg">${l.map(c=>`<button type="button" data-c="${c}" aria-pressed="${c===curCourse}" title="${esc(NM(c))}">${c} <span class="bn">${esc(SH(c))}</span></button>`).join("")}</div></div>`).join("")}${(U.metrics_missing||[]).filter(inG).length?`<div class="cgrp"><span class="eyebrow">${esc(U.missing_label)}</span><div class="seg">${U.metrics_missing.filter(inG).map(c=>`<button type="button" disabled title="${esc(NM(c))}">${c} <span class="bn">${esc(SH(c))}</span></button>`).join("")}</div></div>`:""}</div>
+   <div id="cdetail"></div>
+  </section>`;
+}
+function renderCourse(){
+  const c=curCourse, sc=D.cscores[c], vals=D.cm[c];
+  const missing=!sc[0];
+  const fmtV=(code,v)=>{ if(v==null) return "н/д"; if(["C1","E3","F2","G1"].includes(code)) return String(v).replace(".",","); if(["E1","E2","E4"].includes(code)) return f2(v); return pct(v);};
+  const dims=Object.keys(D.dimn);
+  const head=`<div class="grid g4">
+    ${[0,1,2].map(i=>{const o=sc[i]; return `<div class="tile"><span class="eyebrow">${["Зараз","Хвиля 1","Хвиля 2"][i]}</span>
+     <div class="big"><span class="zone ${o?zone(o.final):"z-na"}" style="font-size:inherit">${o?f1(o.final):"—"}</span>${o&&o.veto?`<span class="chip bad" title="правило вето: проблемна метрика у вимірі A або B">вето</span>`:""}</div>
+     <span class="small muted">${o?`${zoneTxt(o.final)}${o.veto?` · сирий бал ${f1(o.raw)}`:""}`:esc(U.missing_label)}</span></div>`}).join("")}
+    ${K!=null?`<div class="tile"><span class="eyebrow">Очікувано</span><div class="big num">${f1(EXP(sc[1].final,sc[2].final))}</div><span class="small muted">з поправкою на досвід пілоту</span></div>`:`<div class="tile"><span class="eyebrow">Без даних</span><div class="big num">${D.mdef.filter(m=>vals[m[0]].every(x=>x==null)).length} з 24</div><span class="small muted">метрик не обчислено — немає тематичного плану й годин</span></div>`}
+   </div>`;
+  const dimRow=`<div class="tblwrap"><table><thead><tr><th>Вимір</th><th class="r">Вага</th>${["Зараз","Хвиля 1","Хвиля 2"].map(t=>`<th class="r">${t}</th>`).join("")}</tr></thead><tbody>
+   ${dims.map(d=>`<tr><td>${d} · ${esc(D.dimn[d])}</td><td class="r num">${Math.round(D.weights[d]*100)}%</td>${[0,1,2].map(i=>{const v=sc[i]?sc[i].dims[d]:null; return `<td class="r"><span class="zone ${zone(v)}">${v==null?"—":f1(v)}</span></td>`}).join("")}</tr>`).join("")}
+   </tbody></table></div>`;
+  const rows=D.mdef.map(m=>{const v=vals[m[0]]; const s=[0,1,2].map(i=>sc[i]?sc[i].scores[m[0]]:null);
+    const tgt = m[4]==="band" ? `${pct(m[5][0])}–${pct(m[5][1])}` : (m[4]?"≥ ":"≤ ")+fmtV(m[0],m[5]);
+    return `<tr><td class="code">${m[0]}</td><td>${esc(m[2])}<div class="small muted">${esc(m[3])} · ціль ${tgt}</div></td>
+     ${[0,1,2].map(i=>`<td class="r"><span class="zone ${zone(s[i])}">${fmtV(m[0],v[i])}</span></td>`).join("")}</tr>`}).join("");
+  $("#cdetail").innerHTML=`<div style="display:grid;gap:14px">
+   <p><b>${c}</b> · ${esc(NM(c))}${missing?` <span class="chip bad">${esc(U.missing_label)} — значення проєктні</span>`:""}</p>
+   ${head}<div class="grid g2"><div style="min-width:0">${dimRow}</div>
+   <div class="card"><h3>Що рухає бал</h3><p class="small">${esc((X.paths[c]||R.course[c]||{}).verdict||"")}</p>
+    ${sc[0]?`<p class="small">Проблемні метрики зараз: ${sc[0].problems.map(p=>`<span class="code">${p}</span>`).join(", ")||"немає"}.</p><p class="small">${sc[1].problems.length?`Після хвилі 1 лишаються: ${sc[1].problems.map(p=>`<span class="code">${p}</span>`).join(", ")} — це змістові метрики, їх закриває хвиля 2.`:"Після хвилі 1 проблемних метрик не лишається, вето знято."}</p>`:`<p class="small">Бал хвилі 1 — для документа, написаного за структурою з вкладки «Шляхи вдосконалення».</p>`}
+   </div></div>
+   <div class="tblwrap"><table><thead><tr><th>Код</th><th>Метрика</th><th class="r">Зараз</th><th class="r">Хвиля 1</th><th class="r">Хвиля 2</th></tr></thead><tbody>${rows}</tbody></table></div>
+   <p class="small muted">Колір — зона бала метрики: зелений ≥ 85, жовтий 70–84, червоний < 70; сірий «н/д» — немає даних, метрика не входить у бал. Вето: підсумок не вище 75, поки хоча б одна метрика вимірів A або B у проблемній зоні.</p></div>`;
+  document.querySelectorAll("#cseg button").forEach(b=>b.setAttribute("aria-pressed", b.dataset.c===c));
+}
+
+/* ---------- Шляхи ---------- */
+function pathCard(c){
+  const p=X.paths[c]; const sc=D.cscores[c];
+  const scoreTxt = sc ? (sc[0] ? `<span class="zone ${zone(sc[0].final)}">${f1(sc[0].final)}</span><span class="arr">→</span><span class="zone ${zone(sc[2].final)}">${f1(sc[2].final)}</span>` : `<span class="chip bad">новий документ</span> <span class="zone ${zone(sc[1].final)}">${f1(sc[1].final)}</span>`) : "";
+  const rm=p.remove||[], ad=p.add||[], kp=p.keep||[];
+  const labs = (p.labs_now&&p.labs_now.length) || (p.labs_new&&p.labs_new.length);
+  return `<details class="pc ${p.group}" data-c="${c}">
+   <summary><span class="code">${c}</span><span class="pcname">${esc(NM(c))}</span>
+    <span class="pcmeta">${rm.length?`<span class="chip bad">− ${rm.length} прибрати</span>`:""}${ad.length?`<span class="chip ok">+ ${ad.length} додати</span>`:""}${scoreTxt}</span><span class="tw" aria-hidden="true"></span></summary>
+   <div class="pcbody">
+    <p class="verdict">${esc(p.verdict)}</p>
+    <div class="cols3">
+     ${rm.length?`<div class="col rm"><div class="colh">Прибрати або скоротити</div>${rm.map(x=>`<div class="it"><b>${esc(x[0])}</b>${x[1]&&x[1]!=="—"?`<div class="ov">перекривається з: ${esc(x[1])}</div>`:""}<div class="small">${esc(x[2])}</div></div>`).join("")}</div>`:""}
+     <div class="col ad"><div class="colh">Додати</div>${ad.length?ad.map(x=>`<div class="it"><b>${esc(x[0])}</b>${x[1]?`<div class="small">${esc(x[1])}</div>`:""}</div>`).join(""):'<p class="small muted">нічого</p>'}</div>
+     <div class="col kp"><div class="colh">Залишити</div>${kp.length?kp.map(x=>`<div class="it">${esc(x)}</div>`).join(""):'<p class="small muted">—</p>'}</div>
+    </div>
+    ${labs?`<div class="labs"><div><div class="colh">${esc(U.labs_now_label)}</div>${p.labs_now&&p.labs_now.length?`<ol>${p.labs_now.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:`<p class="small muted">${esc(U.missing_label)}</p>`}</div><div class="labarr" aria-hidden="true">→</div><div><div class="colh">${esc(U.labs_new_label)}</div><ol>${p.labs_new.map(x=>`<li>${esc(x)}</li>`).join("")}</ol></div></div>`:""}
+    ${(p.w1||R.course[c]?.w1)?`<div class="labs w"><div><div class="colh">Хвиля 1 · формальні правки</div><ul class="clean small">${(p.w1||R.course[c].w1).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div><div class="labarr" aria-hidden="true"></div><div><div class="colh">Хвиля 2 · зміст</div><ul class="clean small">${(p.w2||R.course[c].w2).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div></div>`:""}
+    ${sc?`<p class="small"><a href="#metrics" class="tometrics" data-c="${c}">Детальні метрики ${c} →</a></p>`:""}
+   </div></details>`;
+}
+function vPaths(){
+  const grp=(t,list,sub)=>`<div class="pgroup"><h3>${t}</h3>${sub?`<p class="small muted">${sub}</p>`:""}${list.map(pathCard).join("")}</div>`;
+  return `<section class="view">
+   <div class="sechead"><span class="eyebrow">Звіт 7</span><h2>Шляхи вдосконалення</h2>
+   <p class="muted">${esc(U.paths_lede)}</p></div>
+   <div class="seg"><button type="button" id="openAll">Розгорнути всі</button><button type="button" id="closeAll">Згорнути всі</button></div>
+   ${U.path_groups.map(g=>[g[0],g[1].filter(inG),g[2]]).filter(g=>g[1].length).map(g=>grp(g[0],g[1],g[2])).join("")}
+   <h3>Для лінії · рішення кафедри</h3>
+   <div class="grid g2">${R.line.map(x=>`<div class="card"><h3>${esc(x.t)}</h3><p class="small">${esc(x.d)}</p></div>`).join("")}</div>
+   <h3>Для наступного перегляду ОП · хвиля 3</h3>
+   <div class="grid g2">${R.opp.map(x=>`<div class="card"><h3>${esc(x.t)}</h3><p class="small">${esc(x.d)}</p></div>`).join("")}</div>
+  </section>`;
+}
+function paBind(){
+  const o=$("#openAll"), c=$("#closeAll"); if(!o) return;
+  o.addEventListener("click",()=>document.querySelectorAll("details.pc").forEach(d=>d.open=true));
+  c.addEventListener("click",()=>document.querySelectorAll("details.pc").forEach(d=>d.open=false));
+  document.querySelectorAll(".tometrics").forEach(a=>a.addEventListener("click",()=>{curCourse=a.dataset.c;}));
+
+}
+
+function vInputs(){
+  const st={ok:["ok","ok"],advisory:["warn","варто"],pending:["neu","очікує"],blocking:["bad","блокує"]};
+  return `<section class="view">
+   <div class="sechead"><span class="eyebrow">Звіт 9 · вхідні дані</span><h2>Вхідні дані й припущення аудитора</h2>
+   <p class="muted">Аудит побудовано лише на наданих документах. Тут — чого бракувало, що аудитор прийняв замість цього, як це вплинуло на висновки і що треба надати, щоб припущення зняти.</p></div>
+   <div class="tblwrap"><table><thead><tr><th>№</th><th>Чого бракує</th><th>Що прийнято замість цього</th><th>Вплив на аудит</th><th>Як зняти</th></tr></thead><tbody>
+   ${A.items.map(a=>`<tr><td class="code">${esc(a.id)}</td><td>${esc(a.missing)}</td><td class="small">${esc(a.assumed)}</td><td class="small">${esc(a.impact)}</td><td class="small">${esc(a.fix)}</td></tr>`).join("")}
+   </tbody></table></div>
+   <div class="grid g2">
+    <div class="card"><h3>Документи, яких немає · ${META.missing.length}</h3><ul class="clean">${META.missing.map(m=>`<li>${esc(m)}</li>`).join("")}</ul>
+     <p class="small muted">Ці ОК враховано в структурі ОП і матрицях, але не в аналізі змісту.</p></div>
+    <div class="card"><h3>Перевірка витягу</h3><p>Цитати-докази знайдено в тексті джерел: <b>${META.grounding.found} з ${META.grounding.total}</b> (${pct(META.grounding.share)}).</p>
+     <p class="small muted">Рішення гаранта: «${esc(META.guarantor)}»</p></div>
+   </div>
+   <h3>Журнал перевірок</h3>
+   <div class="tblwrap"><table><thead><tr><th>Перевірка</th><th>Результат</th><th>Стан</th></tr></thead><tbody>
+   ${(META.journal||[]).map(c=>`<tr><td>${esc(c.check)}</td><td class="small">${esc(c.result)}</td><td><span class="chip ${(st[c.status]||["neu",c.status])[0]}">${(st[c.status]||["neu",c.status])[1]}</span></td></tr>`).join("")}
+   </tbody></table></div>
+  </section>`;
+}
+const RENDER={summary:vSummary,passport:vPassport,prereq:vPrereq,topics:vTopics,market:vMarket,unis:vUnis,metrics:vMetrics,paths:vPaths,inputs:vInputs};
+function route(){
+  let v=(location.hash||"").slice(1); if(!RENDER[v]) v="summary";
+  $("#tabs").innerHTML=VIEWS.map(([k,t])=>`<a href="#${k}" ${k===v?'aria-current="page"':""}>${t}</a>`).join("");
+  const sn=(U.stage_note||{})[v];
+  $("#app").innerHTML=(GMODE?`<div class="gfwrap" id="gfBar">${prFilters()}</div>`:"")+(sn?`<p class="note stage">${esc(sn)}</p>`:"")+RENDER[v]();
+  if(GMODE && v==="metrics" && !inG(curCourse)){ const f=ORDER.flatMap(o=>o[1]).find(inG); if(f) curCourse=f; }
+  if(v==="summary") document.querySelectorAll(".srow[data-c]").forEach(b=>b.addEventListener("click",()=>{curCourse=b.dataset.c; location.hash="metrics";}));
+  if(v==="prereq") prBind(); if(v==="topics"){ if(tpMode==="course") ctBind(); else tpBind(); document.querySelectorAll(".tpmode button").forEach(b=>b.addEventListener("click",()=>{tpMode=b.dataset.m; const y=window.scrollY; route(); window.scrollTo(0,y);})); } if(v==="unis") unBind(); if(v==="paths") paBind();
+  if(v==="metrics"){ renderCourse(); $("#cseg").addEventListener("click",e=>{const b=e.target.closest("button"); if(!b) return; curCourse=b.dataset.c; renderCourse();}); }
+}
+document.getElementById("hEyebrow").textContent=META.eyebrow; document.getElementById("hTitle").textContent=META.h1; document.getElementById("hLede").textContent=META.lede;
+document.getElementById("foot").innerHTML=META.footer.map(s=>`<span>${esc(s)}</span>`).join("");
+document.addEventListener("click",e=>{const b=e.target.closest("#gfBar button[data-f]"); if(!b) return; const f=b.dataset.f; gfInit();
+  if(f==="all"){prOn=new Set((U.groups||U.prereq_groups).map(g=>g.k));} else { if(prOn.has(f)){ if(prOn.size>1) prOn.delete(f);} else prOn.add(f); }
+  const y=window.scrollY; route(); window.scrollTo(0,y);});
+headIdx(); route(); window.addEventListener("hashchange",()=>{route(); window.scrollTo({top:0});});
+</script>
+
+</body></html>

@@ -1,0 +1,424 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "line_inputs.schema.json",
+ "title": "line.json — вхідні дані розрахунку лінії",
+ "type": "object",
+ "required": [
+  "schema_version",
+  "year",
+  "line",
+  "passport",
+  "links",
+  "cols",
+  "topics",
+  "owner",
+  "demand",
+  "universities",
+  "course_metrics",
+  "program_metrics",
+  "pilot"
+ ],
+ "properties": {
+  "schema_version": {
+   "const": "1.0"
+  },
+  "meta": {
+   "type": "object"
+  },
+  "year": {
+   "type": "integer"
+  },
+  "line": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "passport": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "code",
+     "title",
+     "role",
+     "sem",
+     "opp",
+     "rp",
+     "issues"
+    ],
+    "properties": {
+     "code": {
+      "type": "string"
+     },
+     "title": {
+      "type": "string"
+     },
+     "role": {
+      "enum": [
+       "line",
+       "pre",
+       "post"
+      ]
+     },
+     "sem": {
+      "type": "integer"
+     },
+     "opp": {
+      "type": "object",
+      "required": [
+       "credits",
+       "control"
+      ]
+     },
+     "rp": {
+      "type": "object",
+      "required": [
+       "status"
+      ],
+      "properties": {
+       "status": {
+        "enum": [
+         "ok",
+         "missing",
+         "unreadable",
+         "excluded"
+        ]
+       }
+      }
+     },
+     "issues": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   }
+  },
+  "sem_extra": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "integer"
+   }
+  },
+  "links": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "src",
+     "dst",
+     "kind",
+     "as_written"
+    ],
+    "properties": {
+     "src": {
+      "type": "string"
+     },
+     "dst": {
+      "type": [
+       "string",
+       "null"
+      ]
+     },
+     "kind": {
+      "enum": [
+       "prereq",
+       "next",
+       "coreq"
+      ]
+     },
+     "as_written": {
+      "type": "string"
+     }
+    },
+    "additionalProperties": false
+   }
+  },
+  "cols": {
+   "type": "array",
+   "items": {
+    "type": "string"
+   }
+  },
+  "topics": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "key",
+     "name",
+     "cov",
+     "comment"
+    ],
+    "properties": {
+     "key": {
+      "type": "string"
+     },
+     "name": {
+      "type": "string"
+     },
+     "cov": {
+      "type": "object",
+      "additionalProperties": {
+       "enum": [
+        0,
+        1,
+        2,
+        null
+       ]
+      }
+     },
+     "comment": {
+      "type": "string"
+     }
+    }
+   }
+  },
+  "owner": {
+   "type": "object",
+   "additionalProperties": {
+    "type": "string"
+   }
+  },
+  "demand": {
+   "type": "object",
+   "required": [
+    "roles",
+    "skills"
+   ],
+   "properties": {
+    "roles": {
+     "type": "array",
+     "minItems": 1,
+     "items": {
+      "type": "object",
+      "required": [
+       "key",
+       "name"
+      ]
+     }
+    },
+    "skills": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "name",
+       "share",
+       "coverage",
+       "where"
+      ],
+      "properties": {
+       "share": {
+        "type": "object",
+        "additionalProperties": {
+         "type": "number",
+         "minimum": 0,
+         "maximum": 100
+        }
+       },
+       "coverage": {
+        "type": "array",
+        "minItems": 3,
+        "maxItems": 3,
+        "items": {
+         "enum": [
+          0,
+          0.5,
+          1
+         ]
+        }
+       },
+       "where": {
+        "type": "object",
+        "required": [
+         "before",
+         "after"
+        ]
+       },
+       "sources": {
+        "type": "array",
+        "items": {
+         "type": "object",
+         "required": [
+          "url",
+          "date"
+         ],
+         "properties": {
+          "url": {
+           "type": "string"
+          },
+          "date": {
+           "type": "string"
+          },
+          "n": {
+           "type": "integer"
+          }
+         }
+        }
+       }
+      }
+     }
+    }
+   }
+  },
+  "universities": {
+   "type": "object",
+   "required": [
+    "list",
+    "topic_coverage"
+   ],
+   "properties": {
+    "list": {
+     "type": "array",
+     "items": {
+      "type": "object",
+      "required": [
+       "name",
+       "courses",
+       "country"
+      ]
+     }
+    },
+    "topic_coverage": {
+     "type": "object",
+     "additionalProperties": {
+      "type": "array",
+      "items": {
+       "enum": [
+        0,
+        1,
+        2,
+        null
+       ]
+      }
+     }
+    }
+   }
+  },
+  "course_metrics": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "ok",
+     "before",
+     "w1",
+     "w2"
+    ],
+    "properties": {
+     "ok": {
+      "type": "string"
+     },
+     "before": {
+      "type": [
+       "object",
+       "null"
+      ],
+      "additionalProperties": {
+       "type": [
+        "number",
+        "null"
+       ]
+      }
+     },
+     "w1": {
+      "type": [
+       "object",
+       "null"
+      ],
+      "additionalProperties": {
+       "type": [
+        "number",
+        "null"
+       ]
+      }
+     },
+     "w2": {
+      "type": [
+       "object",
+       "null"
+      ],
+      "additionalProperties": {
+       "type": [
+        "number",
+        "null"
+       ]
+      }
+     }
+    }
+   }
+  },
+  "program_metrics": {
+   "type": "array",
+   "items": {
+    "type": "object",
+    "required": [
+     "key",
+     "name",
+     "values",
+     "note"
+    ],
+    "properties": {
+     "key": {
+      "pattern": "^P([1-9]|1[0-2])$"
+     },
+     "name": {
+      "type": "string"
+     },
+     "note": {
+      "type": "string"
+     },
+     "values": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+       "oneOf": [
+        {
+         "type": "number"
+        },
+        {
+         "type": "object",
+         "required": [
+          "calc"
+         ],
+         "properties": {
+          "calc": {
+           "enum": [
+            "rp_completeness",
+            "links_valid_share",
+            "dup_share",
+            "b1",
+            "consensus_coverage",
+            "lit_median_age",
+            "practice_share"
+           ]
+          },
+          "state": {
+           "enum": [
+            0,
+            1,
+            2
+           ]
+          }
+         },
+         "additionalProperties": false
+        },
+        {
+         "type": "null",
+         "description": "н/д: немає даних — метрика не входить в індекс"
+        }
+       ]
+      }
+     }
+    }
+   }
+  },
+  "pilot": {
+   "type": "object"
+  }
+ }
+}

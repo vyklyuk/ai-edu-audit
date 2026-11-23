@@ -1,0 +1,76 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "finding.schema.json",
+ "title": "Зауваження перевірки (автоматичної чи рецензента)",
+ "type": "object",
+ "required": [
+  "id",
+  "type",
+  "severity",
+  "where",
+  "problem",
+  "evidence",
+  "suggestion",
+  "source"
+ ],
+ "properties": {
+  "id": {
+   "type": "string"
+  },
+  "type": {
+   "type": "string",
+   "description": "completeness | grounding | recalc | schema | sources | hub | anonymization | topic_matrix | gaps | recommendations | expert_metrics"
+  },
+  "severity": {
+   "enum": [
+    "blocking",
+    "advisory"
+   ],
+   "description": "блокує | варто"
+  },
+  "where": {
+   "type": "object",
+   "properties": {
+    "file": {
+     "type": "string"
+    },
+    "key": {
+     "type": "string"
+    },
+    "course": {
+     "type": "string"
+    }
+   }
+  },
+  "problem": {
+   "type": "string"
+  },
+  "evidence": {
+   "type": "string",
+   "minLength": 1,
+   "description": "зауваження без доказу відкидається"
+  },
+  "suggestion": {
+   "type": "string"
+  },
+  "source": {
+   "enum": [
+    "auto",
+    "reviewer"
+   ]
+  },
+  "status": {
+   "enum": [
+    "open",
+    "fixed",
+    "disputed",
+    "rejected"
+   ],
+   "default": "open"
+  },
+  "iteration": {
+   "type": "integer"
+  }
+ },
+ "additionalProperties": false
+}

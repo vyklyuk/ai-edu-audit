@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="uk"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>__TITLE__</title><style>__CSS__</style></head>
+<body>
+<header class="top"><div class="wrap">
+ <div class="headrow">
+  <div style="display:grid;gap:6px"><span class="eyebrow" id="eyebrow"></span><h1 id="h1"></h1><p class="lede" id="lede"></p></div>
+  <div class="tile" style="min-width:260px" id="headIdx"></div>
+ </div>
+ <nav class="tabs" id="tabs" aria-label="Розділи"></nav>
+</div></header>
+<main><div class="wrap" id="app"></div></main>
+<div id="pop" role="dialog"></div>
+<footer><div class="wrap" id="foot"></div></footer>
+<script>
+const DATA = __DATA__;
+const {O, A, META} = DATA;
+const $ = (s, el=document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const f1 = x => x==null ? "—" : (Math.round(x*10)/10).toFixed(1);
+const pct = x => x==null ? "—" : Math.round(x*100) + "%";
+const zone = s => s==null ? "z-na" : s>=85 ? "z-ok" : s>=70 ? "z-warn" : "z-bad";
+const chip = (t, k) => `<span class="chip ${k}">${esc(t)}</span>`;
+const SEV = {ok:["ok","ok"], "увага":["увага","warn"], "порушення":["порушення","bad"], "н/д":["не перевірено","na"]};
+
+const VIEWS = [["summary","Зведення"],["structure","Структура"],["comp","Компетентності і ПРН"],["lines","Лінії"],
+ ["norms","Відповідність нормам"],["metrics","Програмні метрики"],["roadmap","Дорожня карта"],["inputs","Вхідні дані й припущення"]];
+
+function headIdx(){
+ const l = O.lines.find(x=>x.hub);
+ $("#headIdx").innerHTML = `<span class="eyebrow">Аудит ліній</span><div class="big">${O.lines.filter(x=>x.hub).length} з ${O.lines.filter(x=>!x.light).length}</div>
+  <span class="small muted">поглиблено: ${l?`<a href="${esc(l.hub)}">${esc(l.name)}</a> (індекс ${f1(l.index[0])} → ${f1(l.index[2])})`:"—"}; решта — експрес-оцінка</span>`;
+}
+function vSummary(){
+ return `<div class="tiles">
+  <div class="tile"><span class="eyebrow">Обсяг ОП</span><div class="big">${O.program.credits} кр.</div><span class="small muted">${esc(O.program.duration)}; обов'язкові ${O.structure.mandatory} / вибіркові ${O.structure.elective} кр.</span></div>
+  <div class="tile"><span class="eyebrow">Освітніх компонентів</span><div class="big">${O.program.n_courses}</div><span class="small muted">силабус є для ${O.program.n_covered}, бракує ${O.program.n_missing}</span></div>
+  <div class="tile"><span class="eyebrow">Повних РП</span><div class="big"><span class="zone z-bad">0</span></div><span class="small muted">усі документи — силабуси без тематичного плану</span></div>
+  <div class="tile"><span class="eyebrow">Вердикт вхідних даних</span><div class="big" style="font-size:18px">${esc(O.verdict)}</div><span class="small muted">гарант погодив аудит без доповнень</span></div>
+ </div><h2>Головні висновки</h2>${O.findings.map(f=>`<div class="finding"><b>${esc(f.t)}</b>${esc(f.x)}</div>`).join("")}`;
+}
+function vStructure(){
+ const sems=[1,2,3,4,5,6,7,8]; const max=Math.max(...sems.map(s=>O.structure.by_sem[s]?.total||0),1);
+ return `<p class="muted">Кредити за семестрами — за теками силабусів (навчального плану немає, припущення A2); ОК без силабуса не мають семестру.</p>
+ <table><thead><tr><th>Семестр</th><th class="r">Обов'язкові</th><th class="r">Вибіркові (одна лінія)</th><th class="r">Разом</th><th></th></tr></thead><tbody>
+ ${sems.map(s=>{const r=O.structure.by_sem[s]||{mand:0,el:0,total:0}; return `<tr><td>${s}</td><td class="r">${r.mand}</td><td class="r">${r.el}</td><td class="r"><b>${r.total}</b></td><td style="width:40%"><div class="bar"><span style="width:${r.total/max*100}%"></span></div></td></tr>`}).join("")}
+ <tr><td>без семестру</td><td class="r">${O.structure.no_sem}</td><td></td><td></td><td class="small muted">ОК без силабуса</td></tr></tbody></table>
+ <h3>Цикли ОП (таблиця переліку ОК)</h3><table><tbody>${Object.entries(O.structure.totals).map(([k,v])=>`<tr><td>${esc(k)}</td><td class="r">${v}</td></tr>`).join("")}</tbody></table>`;
+}
+function vComp(){
+ return `<p class="muted">Скільки ОК формують кожну компетентність / ПРН за матрицями ОП і скільки силабусів її заявляють. Непокриті й «надпокриті» (≥6 ОК) — позначено.</p>
+ <div class="scroll"><table><thead><tr><th>Код</th><th>Формулювання (ОП)</th><th class="r">ОК за матрицею ОП</th><th class="r">Силабусів заявляє</th><th>Стан</th></tr></thead><tbody>
+ ${O.comp.map(c=>`<tr><td><b>${esc(c.code)}</b></td><td class="small">${esc(c.text)}</td><td class="r">${c.opp}</td><td class="r">${c.rp}</td><td>${c.opp===0&&c.rp===0?chip("не покрита","bad"):c.opp===0?chip("немає в матриці","warn"):c.opp>=6?chip("надпокрита","warn"):chip("ok","ok")}</td></tr>`).join("")}
+ </tbody></table></div><h3>Коди в силабусах і матрицях, яких немає в переліку ОП</h3><ul>${O.undefined_codes.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
+}
+function vLines(){
+ return `<p class="muted">Розбиття запропоноване аудитором (припущення A11). Експрес-індекс — з даних силабусів, без ринку й університетів. Пріоритет поглиблення = кредити × (100 − експрес-індекс).</p>
+ <div class="scroll"><table><thead><tr><th>Лінія</th><th class="r">ОК</th><th class="r">Кр.</th><th class="r">Експрес-індекс</th><th class="r">Пріоритет</th><th>Метрики</th><th>Хаб</th></tr></thead><tbody>
+ ${O.lines.map(l=>`<tr><td><b>${esc(l.id)}</b> ${esc(l.name)}<div class="small muted">${l.courses.join(", ")}</div></td><td class="r">${l.courses.length}</td><td class="r">${l.credits}</td><td class="r"><span class="zone ${zone(l.express)}">${f1(l.express)}</span></td><td class="r">${l.priority??"—"}</td>
+  <td class="small">${l.metrics.map(m=>`${m.key} <span class="zone ${zone(m.s)}">${m.v}</span>`).join(" · ")}</td><td>${l.hub?`<a href="${esc(l.hub)}">поглиблений аудит →</a>`:'<span class="small muted">ще не поглиблено</span>'}</td></tr>`).join("")}
+ </tbody></table></div>`;
+}
+function vNorms(){
+ return `<p class="muted">Перевірки структури (етап I.2) — у програмний індекс не входять.</p>
+ <table><thead><tr><th>Перевірка</th><th>Стан</th><th>Доказ</th></tr></thead><tbody>
+ ${O.checks.map(c=>`<tr><td>${esc(c.name)}</td><td>${chip(...(SEV[c.state]||["?","na"]))}</td><td class="small">${esc(c.evidence)}</td></tr>`).join("")}</tbody></table>
+ <h3>Критерії акредитації (I.5)</h3><div class="note">${esc(O.naqa)}</div>`;
+}
+function vMetrics(){
+ return `<p class="muted">P1–P12 — для ліній. Повні значення є для поглибленої лінії; для решти — експрес-метрики (вкладка «Лінії»).</p>
+ ${O.lines.filter(l=>l.prog).map(l=>`<h3>${esc(l.id)} ${esc(l.name)} — індекс ${f1(l.index[0])} → ${f1(l.index[1])} → ${f1(l.index[2])}</h3>
+ <table><thead><tr><th>Метрика</th><th class="r">Зараз</th><th class="r">Хвиля 1</th><th class="r">Хвиля 2</th></tr></thead><tbody>
+ ${l.prog.map(p=>`<tr><td><b>${p.key}</b> ${esc(p.name)}</td>${[0,1,2].map(i=>`<td class="r"><span class="zone ${zone(p.s[i])}">${p.v[i]??"н/д"}</span></td>`).join("")}</tr>`).join("")}</tbody></table>`).join("")}`;
+}
+function vRoadmap(){
+ return `<h3>Порядок поглиблення ліній</h3><ol>${O.roadmap.order.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>
+ <h3>Рішення кафедри</h3><ul>${O.roadmap.decisions.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+ <h3>Перша хвиля: хто, що, яку метрику рухає</h3><table><thead><tr><th>Хто</th><th>Що</th><th>Метрики</th></tr></thead><tbody>${O.roadmap.wave1.map(w=>`<tr><td>${esc(w[0])}</td><td>${esc(w[1])}</td><td>${esc(w[2])}</td></tr>`).join("")}</tbody></table>`;
+}
+function vInputs(){
+ return `<h3>Чого не вистачало для аудиту</h3><div class="scroll"><table><thead><tr><th>№</th><th>Чого бракує</th><th>Що прийнято замість цього</th><th>Вплив на аудит</th><th>Як зняти</th></tr></thead><tbody>
+ ${A.items.map(a=>`<tr><td><b>${esc(a.id)}</b></td><td>${esc(a.missing)}</td><td class="small">${esc(a.assumed)}</td><td class="small">${esc(a.impact)}</td><td class="small">${esc(a.fix)}</td></tr>`).join("")}
+ </tbody></table></div>
+ <h3>Відсутні документи</h3><ul>${META.missing.map(m=>`<li>${esc(m)}</li>`).join("")}</ul>
+ <h3>Звіт про вхідні дані</h3><table><tbody>${META.inventory.map(r=>`<tr><td>${esc(r[0])}</td><td>${esc(r[1])}</td></tr>`).join("")}</tbody></table>
+ <p>Цитати-докази знайдено в тексті джерел: <b>${META.grounding.found} з ${META.grounding.total}</b> (${pct(META.grounding.share)}).</p>
+ <h3>Журнал перевірок</h3><table><thead><tr><th>Перевірка</th><th>Результат</th><th>Стан</th></tr></thead><tbody>${(META.journal||[]).map(c=>`<tr><td>${esc(c.check)}</td><td class="small">${esc(c.result)}</td><td>${chip({ok:"ok",advisory:"варто",pending:"очікує",blocking:"блокує"}[c.status]||c.status, {ok:"ok",advisory:"warn",pending:"na",blocking:"bad"}[c.status]||"na")}</td></tr>`).join("")}</tbody></table>
+ <p class="small muted">Рішення гаранта: «${esc(META.guarantor)}»</p>`;
+}
+const RENDER={summary:vSummary,structure:vStructure,comp:vComp,lines:vLines,norms:vNorms,metrics:vMetrics,roadmap:vRoadmap,inputs:vInputs};
+function show(id){document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-selected", b.dataset.v===id)); $("#app").innerHTML=RENDER[id](); history.replaceState(null,"","#"+id);}
+$("#eyebrow").textContent=META.eyebrow; $("#h1").textContent=META.h1; $("#lede").textContent=META.lede;
+$("#tabs").innerHTML=VIEWS.map(([k,v])=>`<button type="button" data-v="${k}">${v}</button>`).join("");
+document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>show(b.dataset.v));
+$("#foot").innerHTML=META.footer.map(s=>`<span>${esc(s)}</span>`).join("");
+headIdx(); const h=(location.hash||"#summary").slice(1); show(h in RENDER?h:"summary");
+</script></body></html>
