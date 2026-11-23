@@ -57,7 +57,7 @@ function vLines(){
  return `<p class="muted">Розбиття запропоноване аудитором (припущення A11). Експрес-індекс — з даних силабусів, без ринку й університетів. Пріоритет поглиблення = кредити × (100 − експрес-індекс).</p>
  <div class="scroll"><table><thead><tr><th>Лінія</th><th class="r">ОК</th><th class="r">Кр.</th><th class="r">Експрес-індекс</th><th class="r">Пріоритет</th><th>Метрики</th><th>Хаб</th></tr></thead><tbody>
  ${O.lines.map(l=>`<tr><td><b>${esc(l.id)}</b> ${esc(l.name)}<div class="small muted">${l.courses.join(", ")}</div></td><td class="r">${l.courses.length}</td><td class="r">${l.credits}</td><td class="r"><span class="zone ${zone(l.express)}">${f1(l.express)}</span></td><td class="r">${l.priority??"—"}</td>
-  <td class="small">${l.metrics.map(m=>`${m.key} <span class="zone ${zone(m.s)}">${m.v}</span>`).join(" · ")}</td><td>${l.hub?`<a href="${esc(l.hub)}">поглиблений аудит →</a>`:'<span class="small muted">ще не поглиблено</span>'}</td></tr>`).join("")}
+  <td class="small">${l.metrics.map(m=>`${m.key} <span class="zone ${zone(m.s)}">${m.v}</span>`).join(" · ")}</td><td>${l.hub?`<a href="${esc(l.hub)}">у звіті ОП →</a>`:'<span class="small muted">ще не поглиблено</span>'}</td></tr>`).join("")}
  </tbody></table></div>`;
 }
 function vNorms(){

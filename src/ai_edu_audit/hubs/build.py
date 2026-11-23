@@ -2,7 +2,8 @@
 """Збірка хабів підстановкою даних у шаблони (без генерації HTML моделлю).
 
 python -m ai_edu_audit.hubs.build <тека прогону>
-Пише <run>/hubs/overview.html і <run>/hubs/line_<ID>.html для кожної поглибленої лінії (тека line_<ID>/ з data.json).
+Пише <run>/hubs/program.html (основний звіт, поглиблені лінії входять у нього) і overview.html;
+окремі line_<ID>.html — лише з ключем --line-hubs.
 """
 import argparse
 import glob
@@ -82,7 +83,7 @@ def build_line(run, line_dir, meta_common, prog):
     if os.path.exists(ui_path):     # шаблон еталонного хабу (той самий CSS і взаємодії), тексти — з ui.json
         U = _j(ui_path)
         meta["K"] = None if not (L.get("pilot") or {}).get("before") else 0.67
-        tpl = open(os.path.join(TPL, "line_hub_ref.html"), encoding="utf-8").read()
+        tpl = open(os.path.join(TPL, "hub.html"), encoding="utf-8").read()
         payload = json.dumps(dict(D=D, R=R, X=X, U=U, A=A, META=meta), ensure_ascii=False).replace("</", "<\\/")
         html = tpl.replace("__TITLE__", title).replace("__DATA__", payload).replace("__OVERVIEW_LINK__", "overview.html")
         return html, D, L
@@ -128,7 +129,7 @@ def build_overview(run, meta_common, inv, dec, rows, prog, lines_built):
         built = lines_built.get(l["id"])
         olines.append(dict(id=l["id"], name=l["name"], courses=l["courses"], credits=l["credits"], express=l["express_index"],
                            priority=l["priority"], light=l["light"], metrics=l["metrics"],
-                           hub=f"line_{l['id']}.html" if built else None,
+                           hub="program.html" if built else None,
                            index=built["prog_index"] if built else None,
                            prog=[dict(key=p["key"], name=p["name"], v=p["v"], s=p["s"]) for p in built["prog"]] if built else None))
     ctrl = [i for i in inv["issues"] if i["check"] == "consistency" and "форма контролю" in i["text"]]
@@ -190,6 +191,8 @@ def build_overview(run, meta_common, inv, dec, rows, prog, lines_built):
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="python -m ai_edu_audit.hubs.build")
     ap.add_argument("run_dir")
+    ap.add_argument("--line-hubs", action="store_true",
+                    help="також писати окремі хаби поглиблених ліній (line_<ID>.html); за замовчуванням лінія входить у хаб ОП")
     a = ap.parse_args(argv)
     run = a.run_dir
     meta_common, inv, dec, rows = common_meta(run)
@@ -203,8 +206,9 @@ def main(argv=None):
         html, D, L = build_line(run, ld, meta_common, prog)
         lid = L["meta"]["line_id"]
         built[lid] = D
-        with open(os.path.join(out_dir, f"line_{lid}.html"), "w", encoding="utf-8") as f:
-            f.write(html)
+        if a.line_hubs:
+            with open(os.path.join(out_dir, f"line_{lid}.html"), "w", encoding="utf-8") as f:
+                f.write(html)
     pd = os.path.join(run, "program")
     if os.path.exists(os.path.join(pd, "data.json")):
         html, D, L = build_line(run, pd, meta_common, prog)

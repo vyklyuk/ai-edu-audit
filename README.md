@@ -78,6 +78,24 @@ P7, P8 (вік літератури з `courses.jsonl`), P9 (частка лаб
 матриця тем, частки попиту, покриття тем університетами, значення 24 метрик курсів у трьох станах,
 решта P-метрик. Значення в `program_metrics.values` може бути числом або посиланням `{"calc": …}`.
 
+## Хаб усієї ОП (зафіксована версія v1, 23.11.2026)
+
+```bash
+R=runs/interior_b
+(cd $R && PYTHONPATH=../../src python3 ../../tools/extract_links_all.py)   # зв'язки з усіх силабусів → links_all.json
+PYTHONPATH=src python3 -m ai_edu_audit.program $R        # дані хабу ОП → $R/program/*.json
+PYTHONPATH=src python3 -m ai_edu_audit.hubs.build $R     # $R/hubs/program.html — основний звіт (лінія L1 входить у нього) + overview.html; окремий хаб лінії — ключ --line-hubs
+PYTHONPATH=src python3 -m unittest discover -s tests     # зокрема tests/test_program_hub.py — фіксація вигляду v1
+```
+
+- Шаблон вигляду — `src/ai_edu_audit/hubs/templates/hub.html` (один для хабу лінії й хабу ОП). Його ключові елементи
+  (ширина, меню, перемикачі циклів, матриця тем, теми курсів, провідні програми, згорнуті шляхи) перевіряє `tests/test_program_hub.py`.
+- Загальний код збірки — `src/ai_edu_audit/program/`; судження аудитора для конкретної ОП — `runs/<прогон>/program/`:
+  `notes_program.py` (цикли й тексти висновків), `topics_program.py` (теми), `unis_program.py` (провідні програми), `paths_program.py` (шляхи вдосконалення).
+  Нова ОП = новий прогон з такими самими чотирма файлами.
+- Незмінні копії звітів — `archive/` (відкриваються без коду).
+- Методика (`src/ai_edu_audit/calc/methodology.py`) конфіденційна: репозиторій — лише приватний.
+
 ## Стан етапів
 
 - [x] 1. Каркас проєкту

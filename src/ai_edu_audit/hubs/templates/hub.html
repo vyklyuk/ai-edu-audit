@@ -87,6 +87,7 @@ ul.clean{margin:0;padding-left:18px;display:grid;gap:4px}
 .ctbar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--rule-soft)}.ctbar span{display:block;height:100%}.b-unique{background:var(--ok)}.b-dev{background:var(--warn)}.b-near{background:var(--ink-3)}.b-repeat{background:var(--bad)}
 .ctt td{vertical-align:top}.ctt .chip{white-space:normal;line-height:1.3}.cth{margin-bottom:6px}.ctt tr.ct-repeat td:first-child{box-shadow:inset 3px 0 var(--bad)}
 #unTable td.tname{cursor:pointer}#unTable td.tname:hover{text-decoration:underline}#unTable tr.rowsel td{background-image:linear-gradient(rgba(31,78,121,.08),rgba(31,78,121,.08))}
+td .ccl .cc{white-space:normal;max-width:100%}
 .legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:12.5px;color:var(--ink-2);align-items:center}
 .sw{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:5px;border:1px solid var(--rule)}
 /* heatmap */
@@ -612,7 +613,7 @@ const ROLES=U.roles;
 const ownerChips=o=>(o||"").split(" → ").map(x=>/^(ОК|ВБ)\d/.test(x.trim())?cchip(x.trim().split(" ")[0], x.trim().split(" ").slice(1).join(" ")):esc(x)).join(" → ");
 function rolesHtml(){return `<div class="roles">${ROLES.map(r=>`<div class="role"><span class="eyebrow">${esc(r.alt)}</span><h3>${esc(r.n)}</h3><div class="med">${r.med}</div>${r.tr?`<div class="tr ${r.tr[0]}">${r.tr[0]==="up"?"▲":"▼"} ${esc(r.tr[1])}</div>`:""}
  ${r.lad[0]!=="—"?`<div class="ladder">${r.lad.map((v,i)=>`<div>${esc((r.ladl||["Junior","Middle","Senior"])[i])}<b>${esc(v)}</b></div>`).join("")}</div>`:`<p class="small muted">${esc(U.no_ladder)}</p>`}
- <p class="small">${esc(r.dem)}</p><div><div class="wavehead">Лінія дає</div><div class="ccl">${r.now.map(([c,n])=>cchip(c,n)).join("")}</div></div><p class="small"><b>Бракує:</b> ${esc(r.gap)}</p>${r.src?`<p class="small muted">${r.src}</p>`:""}</div>`).join("")}${U.roles_abroad||""}</div>
+ <p class="small">${esc(r.dem)}</p><div><div class="wavehead">${esc(U.roles_gives_label||"Лінія дає")}</div><div class="ccl">${r.now.map(([c,n])=>cchip(c,n)).join("")}</div></div><p class="small"><b>Бракує:</b> ${esc(r.gap)}</p>${r.src?`<p class="small muted">${r.src}</p>`:""}</div>`).join("")}${U.roles_abroad||""}</div>
  <p class="small muted">${esc(U.roles_note)}</p>`;}
 
 function vMarket(){
@@ -630,8 +631,8 @@ function vMarket(){
    ${rolesHtml()}
    <h3>${esc(U.skills_title)}</h3>
    <div class="grid xtiles x2">${U.market_tiles.map(xtile).join("")}</div>
-   <p class="note">${esc(U.market_note)}</p>
-   <div class="tblwrap"><table><thead><tr><th>Одиниця попиту</th>${U.joint_cols.map(c=>`<th>${esc(c)}</th>`).join("")}<th>Лінія зараз · де</th><th>Після хвилі 2 · де</th></tr></thead><tbody>${rows}</tbody></table></div>
+   ${U.market_note?`<p class="note">${esc(U.market_note)}</p>`:""}
+   <div class="tblwrap"><table><thead><tr><th>Одиниця попиту</th>${U.joint_cols.map(c=>`<th>${esc(c)}</th>`).join("")}<th>${esc((U.cov_cols||["Лінія зараз · де"])[0])}</th><th>${esc((U.cov_cols||[0,"Після хвилі 2 · де"])[1])}</th></tr></thead><tbody>${rows}</tbody></table></div>
    <p class="small muted">${esc(U.market_foot)}</p>
    ${U.vacancies_html||""}
   </section>`;
@@ -645,19 +646,33 @@ function vUnis(){
   const rows=D.topics.filter(t=>(D.uni_t[t[0]]||[]).some(x=>x!=null)).map(t=>{const u=D.uni_t[t[0]]; const n=u.filter(x=>x).length; const cons=D.consensus.includes(t[0]);
     const has=Object.entries(t[2]).filter(([c,v])=>v);
     return `<tr><td style="min-width:200px" class="tname pk" data-t="${t[0]}" tabindex="0" role="button" title="Показати, як тему вчать провідні програми">${esc(t[1])} ${cons?'<span class="chip neu">консенсус</span>':''}</td>${D.unis.map((un,i)=>cell(un,t[0],u[i])).join("")}<td class="c num">${n}/${D.unis.length}</td>
-     <td style="min-width:240px"><div class="ccl">${has.length?has.map(([c,v])=>cchip(c,v===2?U.scale_short[2]:U.scale_short[1])).join(""):'<span class="chip bad">немає в лінії</span>'}</div></td></tr>`}).join("");
+     <td style="min-width:240px"><div class="ccl">${has.length?has.map(([c,v])=>cchip(c,v===2?U.scale_short[2]:U.scale_short[1])).join(""):`<span class="chip bad">${GMODE?"немає в програмі":"немає в лінії"}</span>`}</div></td></tr>`}).join("");
   return `<section class="view">
    <div class="sechead"><span class="eyebrow">Звіт 5</span><h2>${esc(U.unis_title)}</h2>
    <p class="muted">${esc(U.unis_lede)}</p></div>
    <div class="legend"><span>● основна тема з практикою</span><span>○ згадка або частина теми</span><span><span class="sw vN"></span>немає публічних даних</span></div>
    <aside class="detail float" id="unDetail" aria-live="polite" hidden></aside>
    <div class="tblwrap"><table class="hm" id="unTable"><thead><tr><th>Тема</th>${D.unis.map(u=>`<th class="uh"><b>${esc(u[0])}</b><span>${esc((X.uni_short||{})[u[0]]||X.uni_courses[u[0]].map(x=>x[0]).filter((v,i,a)=>a.indexOf(v)===i).join(" + "))}</span></th>`).join("")}<th class="c">Разом</th><th>Де в нашій програмі зараз</th></tr></thead><tbody>${rows}</tbody></table></div>
+   ${unis2Html()}
    <div class="grid g2">
     <div class="card"><h3>Що показує порівняння</h3><ul class="clean">${U.unis_notes.map(x=>`<li>${x}</li>`).join("")}</ul></div>
     <div class="card"><h3>Курси порівняння</h3><ul class="clean small">${D.unis.map(u=>`<li><b>${esc(u[0])}</b> <span class="muted">(${esc(u[2])})</span> — ${X.uni_courses[u[0]].map(x=>`${esc(x[0])} «${esc(x[1])}»`).join("; ")}${X.uni_url&&X.uni_url[u[0]]?` · <a href="${esc(X.uni_url[u[0]])}" target="_blank" rel="noopener">план</a>`:""}</li>`).join("")}</ul>
      <p class="small muted">${esc(U.unis_foot)}</p></div>
    </div>
   </section>`;
+}
+function unis2Html(){
+  const u2=U.unis2; if(!u2||!u2.rows||!u2.rows.length) return "";
+  if(GMODE && !prOn.has(u2.group)) return "";
+  const TT=Object.fromEntries(D.topics.map(t=>[t[0],t]));
+  const cell=(v,c)=>v==null?`<td class="cell vN" title="немає даних"><span>?</span></td>`:`<td class="cell v${v}" title="${esc(c||"у плані немає")}"><span>${v===2?"●":v===1?"○":""}</span></td>`;
+  const rows=u2.rows.filter(r=>TT[r[0]]).map(([t,vals,crs])=>{const tt=TT[t]; const n=vals.filter(x=>x).length;
+    const ours=Object.entries(tt[2]).filter(([c,v])=>v&&GRP(c)===u2.group);
+    return `<tr><td style="min-width:220px">${esc(tt[1])}</td>${vals.map((v,i)=>cell(v,crs[i])).join("")}<td class="c num">${n}/${vals.length}</td>
+     <td style="min-width:220px"><div class="ccl">${ours.length?ours.map(([c,v])=>cchip(c,v===2?U.scale_short[2]:U.scale_short[1])).join(""):'<span class="chip bad">немає в лінії</span>'}</div></td></tr>`}).join("");
+  return `<h3 style="margin-top:22px">${esc(u2.title)}</h3><p class="muted">${esc(u2.lede)} Наведіть курсор на позначку — назва курсу.</p>
+   <div class="tblwrap"><table class="hm"><thead><tr><th>Тема</th>${u2.unis.map(u=>`<th class="uh"><b><a href="${esc(u[3])}" target="_blank" rel="noopener">${esc(u[0])}</a></b><span>${esc(u[1])}</span></th>`).join("")}<th class="c">Разом</th><th>Де в лінії ВБ2</th></tr></thead><tbody>${rows}</tbody></table></div>
+   <div class="card"><h3>Що показує порівняння лінії 2</h3><ul class="clean">${u2.notes.map(x=>`<li>${x}</li>`).join("")}</ul></div>`;
 }
 function unBind(){
   const tb=$("#unTable"); if(!tb) return;

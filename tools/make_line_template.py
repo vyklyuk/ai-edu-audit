@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """Робить параметризований шаблон хабу лінії з еталонного line1_IAD_hub.html:
 той самий CSS, розмітка й взаємодії; усі специфічні для лінії 1 тексти й списки — з даних (U, META)."""
-import re, sys
+import os, re, sys
+# ЗАСТАРІЛО: це перший крок історії шаблону. Чинний шаблон — src/ai_edu_audit/hubs/templates/hub.html
+# (зафіксована версія v1, 23.11.2026); у нього внесено багато правок вручну, тож перегенерація їх знищила б.
 src = open(sys.argv[1], encoding="utf-8").read()
 out = sys.argv[2]
+if os.path.basename(out) == "hub.html" and os.path.exists(out) and "--force" not in sys.argv:
+    raise SystemExit("Відмова: hub.html — зафіксований шаблон v1. Пишіть в інший файл або додайте --force.")
 
 def rep(old, new, count=1):
     global src
